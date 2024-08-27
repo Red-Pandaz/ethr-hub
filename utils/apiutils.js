@@ -26,7 +26,7 @@ async function accessSecret(secretName) {
     const client = new SecretManagerServiceClient();
   
     try {
-      const name = client.secretVersionPath('EthrHub', secretName, 'latest')
+      const name = client.secretVersionPath('ethrhub', secretName, 'latest')
       const [version] = await client.accessSecretVersion({ name });
       const payload = version.payload.data.toString('utf8');
       return payload;

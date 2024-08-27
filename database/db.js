@@ -3,7 +3,7 @@ const { MongoClient } = require('mongodb');
 const { retryApiCall, accessSecret } = require('../utils/apiutils.js');
 
 let client;
-let dbName = 'Ethr-Hub';
+let dbName = 'EthrHub';
 
 async function getClient() {
     if (!client || !client.topology.isConnected()) {
@@ -23,3 +23,4 @@ async function closeConnection() {
 }
 
 module.exports = { getClient, closeConnection };
+
