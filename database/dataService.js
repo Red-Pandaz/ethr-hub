@@ -4,62 +4,25 @@ const { retryApiCall, accessSecret } = require('../utils/apiutils.js');
 const dbName = 'EthrHub'
 const { getClient, closeConnection } = require('./db');
 
-
-async function getPosts(){
+async function getCollection(collectionName){
     try {
         const db = await getClient();
-        const postCollection = db.collection('Posts');
-        const postDocuments = await postCollection.find({}).toArray();
-        return postDocuments
+        const collection = db.collection(collectionName);
+        const documents = await collection.find({}).toArray();
+        return documents
     } catch (err) {
-        console.error("Error retrieving posts", err);
-    }
-
-}
-
-async function getChannels(){
-    try {
-        const db = await getClient();
-        const channelCollection = db.collection('Channels');
-        const channelDocuments = await channelCollection.find({}).toArray();
-        return channelDocuments
-    } catch (err) {
-        console.error("Error retrieving posts", err);
+        console.error(`Error retrieving ${collectionName}`, err);
     }
 }
 
-async function getUsers(){
+async function createEntry(collectionName, entry){
     try {
         const db = await getClient();
-        const userCollection = db.collection('Users');
-        const userDocuments = await userCollection.find({}).toArray();
-        return userDocuments
+        const collection = db.collection(collectionName);
+        await collection.insertOne(entry)
+        console.log(`New ${collectionName} entry added`)
     } catch (err) {
-        console.error("Error retrieving posts", err);
-    }
-
-}
-
-async function getComments(){
-    try {
-        const db = await getClient();
-        const commentCollection = db.collection('Comments');
-        const commentDocuments = await commentCollection.find({}).toArray();
-        return commentDocuments
-    } catch (err) {
-        console.error("Error retrieving posts", err);
-    }
-
-}
-
-async function getVotes(){
-    try {
-        const db = await getClient();
-        const voteCollection = db.collection('Votes');
-        const voteDocuments = await voteCollection.find({}).toArray();
-        return voteDocuments
-    } catch (err) {
-        console.error("Error retrieving posts", err);
+        console.error(`Error adding new ${collectionName} entry`, err);
     }
 
 }
@@ -224,6 +187,7 @@ async function createChannel(newChannel){
 }
 
 async function createComment(newComment){
+    try{
         const db = await getClient();
         const commentCollection = db.collection('Comments');
         await commentCollection.insertOne(newComment)
@@ -265,19 +229,37 @@ async function createCommentVote(newCommentVote){
     } catch (err) {
         console.error("Error retrieving posts", err);
     }
+     
+}
+
+async function findOneByIndex(collectionName, params){
+    try {
+        const db = await getClient();
+        const collection = db.collection(collectionName);
+        const document = await collection.findOne(params)
+        console.log('document found: ' + document)
+    } catch (err) {
+        console.error("Error retrieving document", err);
+    }
     
 }
 
+async function findByIndex(collectionName, params){
+    try {
+        const db = await getClient();
+        const collection = db.collection(collectionName);
+        const documents = await collection.find(params)
+        console.log('documents found: ' + documents)
+    } catch (err) {
+        console.error("Error retrieving documents", err);
+    }
+    
+
+}
+
 module.exports = { 
-    getPosts, 
-    getChannels, 
-    getUsers, 
-    getComments, 
-    getVotes, 
-    createComment, 
-    createPost, 
-    createChannel, 
-    createUser, 
-    createPostVote,
-    createCommentVote
+    findByIndex,
+    findOneByIndex,
+    getCollection,
+    createEntry,
 }

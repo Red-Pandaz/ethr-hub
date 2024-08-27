@@ -3,19 +3,22 @@ const { getClient, closeConnection } = require('./database/db.js')
 const { retryApiCall, accessSecret } = require('./utils/apiutils.js');
 
 async function main(){
-    const posts = await dataSource.getPosts()
-    const channels = await dataSource.getChannels()
-    const comments = await dataSource.getComments()
-    const users = await dataSource.getUsers()
-    const votes = await dataSource.getVotes()
+    const posts = await dataSource.getCollection('Posts')
+    const channels = await dataSource.getCollection('Channels')
+    const comments = await dataSource.getCollection('Comments')
+    const users = await dataSource.getCollection('Users')
+    const postVotes = await dataSource.getCollection('Post Votes')
+    const commentVotes = await dataSource.getCollection('Comment Votes')
 
     console.log("Posts: ", JSON.stringify(posts, null, 2));
     console.log("Users: ", JSON.stringify(users, null, 2));
     console.log("Channels: ", JSON.stringify(channels, null, 2));
     console.log("Comments: ", JSON.stringify(comments, null, 2));
-    console.log("Votes: ", JSON.stringify(votes, null, 2));
+    console.log("Post Votes: ", JSON.stringify(postVotes, null, 2));
+    console.log("Comment Votes: ", JSON.stringify(commentVotes, null, 2));
 
-    await dataSource.createPostVote(
+    await dataSource.createEntry(
+        'Post Votes',
         {
             userId: "testUser123",
             postId: "testPost456",
@@ -24,7 +27,8 @@ async function main(){
         }
     )
 
-    await dataSource.createCommentVote(
+    await dataSource.createEntry(
+        'Comment Votes',
         {
             userId: "testUser123",
             commentId: "testComment456",
@@ -33,7 +37,8 @@ async function main(){
         }
     )
 
-    await dataSource.createUser(
+    await dataSource.createEntry(
+        'Users',
         {
             channels: [
               "609c1f76324b5e17b8c8e1a1",
@@ -62,10 +67,12 @@ async function main(){
               }
             }
         }
+
     )
+ 
 
-
-    await dataSource.createChannel(
+    await dataSource.createEntry(
+        'Channels',
         {
             userId: "testUser123",
             postId: "testPost456",
@@ -76,7 +83,8 @@ async function main(){
     )
 
 
-    await dataSource.createComment(
+    await dataSource.createEntry(
+        'Comments',
         {
             postId: "postId1",
             userId: "userId3",
@@ -97,20 +105,49 @@ async function main(){
     )
 
 
-    await dataSource.createUser(
+    await dataSource.createEntry(
+        'Users',
         {
-            userId: "testUser123",
-            postId: "testPost456",
-            hasUpvoted: true,
-            hasDownvoted: true
-        }
+            channels: [
+              "609c1f76324b5e17b8c8e1a1",
+              "609c1f76324b5e17b8c8e1a2"
+            ],
+            votes: {
+              posts: {
+                upvotes: [
+                  "609c1f76324b5e17b8c8e1b1",
+                  "609c1f76324b5e17b8c8e1b2"
+                ],
+                downvotes: [
+                  "609c1f76324b5e17b8c8e1b3",
+                  "609c1f76324b5e17b8c8e1b4"
+                ]
+              },
+              comments: {
+                "upvotes": [
+                  "709c1f76324b5e17b8c8e1b1",
+                  "709c1f76324b5e17b8c8e1b2"
+                ],
+                downvotes: [
+                  "709c1f76324b5e17b8c8e1b3",
+                  "709c1f76324b5e17b8c8e1b4"
+                ]
+              }
+            },
+            posts: [
+              "609c1f76324b5e17b8c8e1c1",
+              "609c1f76324b5e17b8c8e1c2"
+            ],
+            savedPosts: [
+              "809c1f76324b5e17b8c8e1d1",
+              "809c1f76324b5e17b8c8e1d2"
+            ],
+            createdAt: "2024-08-26T12:00:00.000Z",
+            lastLogin: "2024-08-26T12:00:00.000Z",
+            "ensName": "example.eth"
+          },
     
     )
-
-
-
-
-
 
 
     
