@@ -52,6 +52,18 @@ async function getComments(){
 
 }
 
+async function getVotes(){
+    try {
+        const db = await getClient();
+        const voteCollection = db.collection('Votes');
+        const voteDocuments = await voteCollection.find({}).toArray();
+        return voteDocuments
+    } catch (err) {
+        console.error("Error retrieving posts", err);
+    }
+
+}
+
 
 
 async function savePost(userId, postId){
@@ -189,50 +201,83 @@ async function deleteReply(){
 
 
 
-async function createUser(userArray, userId){
-    const newUserObj = {
-        "_id": userId,
-        "channels": [],
-        "votes": {
-            "posts": {
-                "upvotes": [],
-                "downvotes": []
-            },
-            "comments": {
-                "upvotes": [],
-                "downvotes": []
-                }
-            }
-    }
-    userArray.push(newUserObj)
-    
-
-}
-
-async function createChannel(channelArray, userId, newChannelObj){
-
-}
-
-async function createReply(postId, newCommentObj){
+async function createUser(newUser){
     try {
         const db = await getClient();
-        const collection = db.collection('posts');
-        // Fetch and return posts
+        const userCollection = db.collection('Users');
+        await userCollection.insertOne(newUser)
+        console.log('user added')
     } catch (err) {
         console.error("Error retrieving posts", err);
     }
-
 }
 
-async function createPost(userId, channelId, newPost){
+async function createChannel(newChannel){
     try {
         const db = await getClient();
-        const collection = db.collection('posts');
-        // Fetch and return posts
+        const channelCollection = db.collection('Channels');
+        await channelCollection.insertOne(newChannel)
+        console.log('channgel added')
+    } catch (err) {
+        console.error("Error retrieving posts", err);
+    }
+}
+
+async function createComment(newComment){
+        const db = await getClient();
+        const commentCollection = db.collection('Comments');
+        await commentCollection.insertOne(newComment)
+        console.log('comment added')
+    } catch (err) {
+        console.error("Error retrieving posts", err);
+    }
+}
+
+async function createPost(newPost){
+    try {
+        const db = await getClient();
+        const postCollection = db.collection('Posts');
+        await postCollection.insertOne(newPost)
+        console.log('post added')
+    } catch (err) {
+        console.error("Error retrieving posts", err);
+    }
+}
+
+async function createPostVote(newPostVote){
+    try {
+        const db = await getClient();
+        const postVoteCollection = db.collection('Post Votes');
+        await postVoteCollection.insertOne(newPostVote)
+        console.log('vote added')
     } catch (err) {
         console.error("Error retrieving posts", err);
     }
     
 }
 
-module.exports = { getPosts, getChannels, getUsers, getComments, createReply, createPost, createChannel, createUser }
+async function createCommentVote(newCommentVote){
+    try {
+        const db = await getClient();
+        const commentVoteCollection = db.collection('Comment Votes');
+        await commentVoteCollection.insertOne(newCommentVote)
+        console.log('vote added')
+    } catch (err) {
+        console.error("Error retrieving posts", err);
+    }
+    
+}
+
+module.exports = { 
+    getPosts, 
+    getChannels, 
+    getUsers, 
+    getComments, 
+    getVotes, 
+    createComment, 
+    createPost, 
+    createChannel, 
+    createUser, 
+    createPostVote,
+    createCommentVote
+}
