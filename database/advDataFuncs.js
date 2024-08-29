@@ -49,6 +49,10 @@ async function getDataForUserFeed(uid){
 console.log(userFeed)
 }
 
+async function getDataForDefaultFeed(){
+
+}
+
 async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction){
     if(!voteId){
         const newVoteObj = {};
@@ -218,12 +222,23 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction){
 }
 
 async function saveChannel(uid, cid){
-    await dataService.addToDocumentArray('Users', uid, 'savedPosts', cid)
+    await dataService.addToDocumentArray('Users', uid, 'savedChannels', cid)
     return
 }
 
 async function unsaveChannel(uid,cid){
-    await dataService.removeFromDocumentArray('Users', uid, 'savedPosts', cid)
+    await dataService.removeFromDocumentArray('Users', uid, 'savedChannels', cid)
+    return
+
+}
+
+async function savePost(uid, pid){
+    await dataService.addToDocumentArray('Users', uid, 'savedPosts', pid)
+    return
+}
+
+async function unsavePost(uid, pid){
+    await dataService.removeFromDocumentArray('Users', uid, 'savedPosts', pid)
     return
 
 }
@@ -243,28 +258,164 @@ async function writeComment(commentText, uid, pid, replyToId){
           downvotes: []
         }
       }
-    await dataService.createDocument(
+    const newComment = await dataService.createDocument(
         'Comments',
         commentObj
     )
+    // await dataService.
 }
+
 
 async function editComment(newCommentText, uid, pid){
+    await dataService.updateDocumentById(
+        'Comments',
+        pid,
+        {
+            modifiedAt: new Date(),
+            text: newCommentText
+
+        }
+    )
 
 }
 
-async function deleteComment(){
+async function deleteComment(cid, uid, pid){
+    await dataService.deleteDocumentById(
+        'Comments',
+        cid
+    )
 
 }
+
+async function writePost(postText, postTitle, uid, cid){
+    const newPostObj = 
+    {
+        channel: cid,
+        url: null,
+        title: postTitle,
+        text: postText,
+        votes: {
+          upvotes: [],
+          downvotes: []
+        },
+        comments: [],
+        createdBy: uid,
+        createdAt: new Date(),
+        modifiedAt: new Date(),
+      }
+    const newPost = await dataService.createDocument(
+        'Posts',
+        newPostObj
+    )
+    await dataService.addToDocumentArray('Channels', cid, posts, newPost._id)
+    await dataService.addToDocumentArray('Users', uid, posts, newPost._id)
+}
+
+
+async function editPost(newCommentText, uid, pid){
+    await dataService.updateDocumentById(
+        'Posts',
+        pid,
+        {
+            modifiedAt: new Date(),
+            text: newPostText
+
+        }
+    )
+
+}
+
+async function deletePost(cid, uid, pid){
+    await dataService.deleteDocumentById(
+        'Comments',
+        cid
+    )
+
+}
+
+async function createChannel(channelName, channelDescription, uid){
+    const channelCheck = await dataService.findOneDocumentByIndex(
+        'Channels', 
+        {
+            name: channelName
+        }
+    )
+        if(channelCheck){
+            console.log('Channel name already exists')
+            return
+        } else{
+            const newChannelObj = {
+                name: channelName,
+                description: channelDescription,
+                subscribers: [uid],
+                posts: [],
+                createdBy: uid,
+                createdAt: new Date(),
+                lastUpdated: new Date()
+            }
+        const newChannel = await dataService.createDocument('Channels', newChannelObj)
+        const newChannelId = newChannel.insertedId.toString()
+        console.log(newChannelId)
+        await dataService.addToDocumentArray('Users', uid, 'channels', newChannelId)
+        }
+}
+
+async function createUser(ethAddress){
+    console.log(ethAddress)
+    const userCheck = await dataService.findOneDocumentByIndex(
+        'Users',
+        {
+            _id: ethAddress
+
+        }
+    )
+    console.log(userCheck)
+    if(userCheck){
+        console.log('User already exists')
+        return
+    } else{
+        const newUserObj = {
+            _id: ethAddress,
+            channels: ["channelId1"],
+            votes: {
+              posts: {
+                upvotes: [],
+                downvotes: []
+              },
+              comments: {
+                upvotes: [],
+                downvotes: []
+              }
+            },
+            posts: [],
+            savedPosts: [],
+            createdAt: new Date(),
+            lastLogin: new Date(),
+            ensName: null
+          }
+        
+          await dataService.createDocument('Users', newUserObj)
+    }
+
+}
+
 
 module.exports = { 
     getDataForPostPage,
     getDataForUserFeed,
+    getDataForDefaultFeed,
     toggleVote,
     saveChannel,
     unsaveChannel,
+    savePost,
+    unsavePost,
     writeComment,
     editComment,
     deleteComment,
+    writePost,
+    editPost,
+    deletePost,
+    createChannel,
+    createUser
 }
  

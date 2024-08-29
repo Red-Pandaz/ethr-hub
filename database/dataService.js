@@ -24,8 +24,9 @@ async function createDocument(collectionName, entry){
     try {
         const db = await getClient();
         const collection = db.collection(collectionName);
-        await collection.insertOne(entry)
+        const result = await collection.insertOne(entry)
         console.log(`New ${collectionName} entry added`)
+        return result
     } catch (err) {
         console.error(`Error adding new ${collectionName} entry`, err);
     }
@@ -41,6 +42,9 @@ async function findOneDocumentByIndex(collectionName, params){
             console.log('document found: '+ JSON.stringify(document, null, 2));
         } else{
             console.log('document not found')
+            console.log(collectionName)
+            console.log(params)
+            return false
         }
         return document
     } catch (err) {
@@ -57,6 +61,7 @@ async function findDocumentsByIndex(collectionName, params){
             console.log('document(s) found: '+ JSON.stringify(documents, null, 2));
         } else{
             console.log('document(s) not found')
+            return false
         }
         return documents
     } catch (err) {

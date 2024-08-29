@@ -5,9 +5,14 @@ const { retryApiCall, accessSecret } = require('./utils/apiutils.js');
 
 async function main(){
 
-    const id = 'userId1'
-    const results = await advData.getDataForUserFeed(id)
-    console.log(results)
+    // await advData.createChannel('Main4', 'A test channel', 'userId1')
+    // await advData.createUser('userId12')
+    // await advData.writeComment('This is a test comment', 'userId12', 'postId1')
+    // await advData.toggleVote()
+    await advData.saveChannel('userId11', '66d0b653e104f32e3c0f36cc')
+    // const id = 'userId1'
+    // const results = await advData.getDataForUserFeed(id)
+    // console.log(results)
 
     // let channels = await dataService.findDocumentsByIndex(
     //     'Channels',
