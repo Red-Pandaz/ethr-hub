@@ -49,11 +49,47 @@ async function getDataForUserFeed(uid){
 console.log(userFeed)
 }
 
-async function toggleVote(voteId, voteType, itemType, voteState, userAction){
+async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction){
     if(!voteId){
-        //perform functions for creating new vote
+        const newVoteObj = {};
+        newVoteObj.userId = uid;
+        if(voteType === 'Comment Votes'){
+            newVoteObj.commentId = itemId;
+
+        } else if(voteType === 'Post Votes'){
+            newVoteObj.postId = itemId
+        }
+        if(userAction === 'Upvote'){
+            newVoteObj.hasUpvoted = true;
+            newVoteObj.hasDownvoted = false;
+            //change vote tally on item document
+            await dataService.addToDocumentArray(itemType, itemId, votes.upvotes, uid)
+        } else if(userAction === 'Downvote'){
+            newVoteObj.hasUpvoted = false;
+            newVoteObj.hasDownvoted = true
+            //change vote tally on item document
+            await dataService.addToDocumentArray(itemType, itemId, votes.downvotes, uid)
+        }
+        const newVote = await dataService.createDocument(voteType, newVoteObj);
+        const userVoteType = itemType.toLowerCase()
+        if(newVote.hasUpvoted){
+            if(itemType === 'Posts'){
+                await dataService.addToDocumentArray('Users', uid, votes.posts.upvotes, newVote._id)
+            }else if(itemType === 'Comments'){
+                await dataService.addToDocumentArray('Users', uid, votes.comments.upvotes, newVote._id)
+            }
+        } else if (newVote.hasDownvoted){
+            if(itemType === 'Posts'){
+                await dataService.addToDocumentArray('Users', uid, votes.posts.downvotes, newVote._id)
+            }else if(itemType === 'Comments'){
+                await dataService.addToDocumentArray('Users', uid, votes.comments.downvotes, newVote._id)
+            }
+
+        }
+
         return
     }
+
     const vote = await dataService.findOneDocumentByIndex(
         voteType,
         {
