@@ -22,6 +22,12 @@ async function getDataForPostPage(pid){
             postId: pid
         }
     )
+    results.commentVotes = await dataService.findDocumentsByIndex(
+        'Comment Votes',
+        {
+            postId: pid
+        }
+    )
 
 return results
 }
@@ -33,7 +39,7 @@ async function getDataForUserFeed(uid){
             _id: uid
         }
     )
-    const userChannelIds = user.channels
+    const userChannelIds = user.savedChannels
     console.log(userChannelIds)
     const userFeed = []
     for(let userChannel of userChannelIds){
@@ -59,7 +65,13 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction){
         newVoteObj.userId = uid;
         if(voteType === 'Comment Votes'){
             newVoteObj.commentId = itemId;
-
+            const comment = await dataService.findOneDocumentByIndex(
+                'Comments',
+                {
+                    _id: itemId
+                }
+            )
+            newVoteObj.postId = comment.postId
         } else if(voteType === 'Post Votes'){
             newVoteObj.postId = itemId
         }
@@ -75,7 +87,6 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction){
             await dataService.addToDocumentArray(itemType, itemId, votes.downvotes, uid)
         }
         const newVote = await dataService.createDocument(voteType, newVoteObj);
-        const userVoteType = itemType.toLowerCase()
         if(newVote.hasUpvoted){
             if(itemType === 'Posts'){
                 await dataService.addToDocumentArray('Users', uid, votes.posts.upvotes, newVote._id)
@@ -240,6 +251,37 @@ async function savePost(uid, pid){
 async function unsavePost(uid, pid){
     await dataService.removeFromDocumentArray('Users', uid, 'savedPosts', pid)
     return
+}
+
+async function toggleSave(uid, itemId, itemType){
+    
+    try {
+        const user = await dataService.findOneDocumentByIndex(
+            'Users',
+            {
+                _id: uid
+            }
+        ); 
+        const saveArray = `saved${itemType}`
+        console.log('save array' + saveArray)
+        const isSaved = user[saveArray].includes(itemId);
+        console.log('is saved: ' + isSaved)
+
+        if (isSaved) {
+            await dataService.removeFromDocumentArray('Users', uid, saveArray, itemId)
+          
+            console.log(`${itemType} ${itemId} unsaved for user ${uid}`);
+        } else {
+
+            await dataService.addToDocumentArray('Users', uid, saveArray, itemId)
+            console.log(`${itemType} ${itemId} saved for user ${uid}`);
+        }
+
+        return !isSaved; 
+    } catch (err) {
+        console.error(`Error toggling save for ${itemType} ${itemId} and user ${uid}`, err);
+        throw err;
+    }
 
 }
 
@@ -356,7 +398,7 @@ async function createChannel(channelName, channelDescription, uid){
         const newChannel = await dataService.createDocument('Channels', newChannelObj)
         const newChannelId = newChannel.insertedId.toString()
         console.log(newChannelId)
-        await dataService.addToDocumentArray('Users', uid, 'channels', newChannelId)
+        await dataService.addToDocumentArray('Users', uid, 'savedChannels', newChannelId)
         }
 }
 
@@ -376,7 +418,9 @@ async function createUser(ethAddress){
     } else{
         const newUserObj = {
             _id: ethAddress,
-            channels: ["channelId1"],
+            savedChannels: ["channelId1"],
+            savedPosts: [],
+            savedComments: [],
             votes: {
               posts: {
                 upvotes: [],
@@ -388,7 +432,6 @@ async function createUser(ethAddress){
               }
             },
             posts: [],
-            savedPosts: [],
             createdAt: new Date(),
             lastLogin: new Date(),
             ensName: null
@@ -416,6 +459,7 @@ module.exports = {
     editPost,
     deletePost,
     createChannel,
-    createUser
+    createUser,
+    toggleSave
 }
  
