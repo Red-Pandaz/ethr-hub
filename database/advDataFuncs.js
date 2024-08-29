@@ -84,7 +84,6 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction){
             }else if(itemType === 'Comments'){
                 await dataService.addToDocumentArray('Users', uid, votes.comments.downvotes, newVote._id)
             }
-
         }
 
         return
@@ -107,10 +106,16 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction){
                     hasUpvoted: true,
                 }
             );
+            await dataService.addToDocumentArray(itemType, itemId, votes.upvotes, uid)
+            if(itemType === 'Posts'){
+                await dataService.addToDocumentArray('Users', uid, votes.posts.upvotes, newVote._id)
+            }else if(itemType === 'Comments'){
+                await dataService.addToDocumentArray('Users', uid, votes.comments.upvotes, newVote._id)
+            }
 
             //logic for turning neutral to upvote
 
-        } else if (userAction === 'Downvote'){
+        else if (userAction === 'Downvote'){
 
             await dataService.updateDocumentById(
                 voteType,
@@ -119,6 +124,13 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction){
                     hasDownvoted: true,
                 }
             );
+            await dataService.addToDocumentArray(itemType, itemId, votes.downvotes, uid)
+            if(itemType === 'Posts'){
+                await dataService.addToDocumentArray('Users', uid, votes.posts.downvotes, newVote._id)
+            }else if(itemType === 'Comments'){
+                await dataService.addToDocumentArray('Users', uid, votes.comments.downvotes, newVote._id)
+            }
+
 
         }
 
@@ -132,6 +144,14 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction){
                         hasUpvoted: false,
                 }
             );
+ 
+            await dataService.removeFromDocumentArray(itemType, itemId, votes.upvotes, uid)
+            if(itemType === 'Posts'){
+                await dataService.removeFromDocumentArray('Users', uid, votes.posts.upvotes, voteId)
+            }else if(itemType === 'Comments'){
+                await dataService.removeFromDocumentArray('Users', uid, votes.comments.upvotes, voteId)
+            }
+            
 
         } else if (userAction === 'Downvote'){
 
@@ -143,6 +163,15 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction){
                     hasDownvoted: true
                 }
             );
+            await dataService.addToDocumentArray(itemType, itemId, votes.downvotes, uid)
+            await dataService.removeFromDocumentArray(itemType, itemId, votes.upvotes, uid)
+            if(itemType === 'Posts'){
+                await dataService.addToDocumentArray('Users', uid, votes.posts.downvotes, newVote._id)
+                await dataService.removeFromDocumentArray('Users', uid, votes.posts.upvotes, newVote._id)
+            }else if(itemType === 'Comments'){
+                await dataService.addToDocumentArray('Users', uid, votes.comments.downvotes, newVote._id)
+                await dataService.removeFromDocumentArray('Users', uid, votes.comments.upvotes, newVote._id)
+            }
         }
 
     } else if(!hasUpvoted && hasDownvoted){
@@ -156,6 +185,15 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction){
                     hasDownvoted: false
                 }
             );
+            await dataService.addToDocumentArray(itemType, itemId, votes.upvotes, uid)
+            await dataService.removeFromDocumentArray(itemType, itemId, votes.downvotes, uid)
+            if(itemType === 'Posts'){
+                await dataService.addToDocumentArray('Users', uid, votes.posts.upvotes, newVote._id)
+                await dataService.removeFromDocumentArray('Users', uid, votes.posts.downvotes, newVote._id)
+            }else if(itemType === 'Comments'){
+                await dataService.addToDocumentArray('Users', uid, votes.comments.upvotes, newVote._id)
+                await dataService.removeFromDocumentArray('Users', uid, votes.comments.downvotes, newVote._id)
+            }
             //logic for turning downvote to upvote
 
         } else if (userAction === 'Downvote'){
@@ -168,16 +206,25 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction){
                 }
             );
                 
+            await dataService.removeFromDocumentArray(itemType, itemId, votes.downvotes, uid)
+            if(itemType === 'Posts'){
+                await dataService.addToDocumentArray('Users', uid, votes.posts.downvotes, newVote._id)
+            }else if(itemType === 'Comments'){
+                await dataService.removeFromDocumentArray('Users', uid, votes.comments.upvotes, newVote._id)
+            }
         }
     }
 }
-
+}
 
 async function saveChannel(uid, cid){
-
+    await dataService.addToDocumentArray('Users', uid, 'savedPosts', cid)
+    return
 }
 
 async function unsaveChannel(uid,cid){
+    await dataService.removeFromDocumentArray('Users', uid, 'savedPosts', cid)
+    return
 
 }
 
@@ -202,7 +249,7 @@ async function writeComment(commentText, uid, pid, replyToId){
     )
 }
 
-async function editComment(){
+async function editComment(newCommentText, uid, pid){
 
 }
 
@@ -210,8 +257,14 @@ async function deleteComment(){
 
 }
 
-
 module.exports = { 
     getDataForPostPage,
-    getDataForUserFeed
- }
+    getDataForUserFeed,
+    toggleVote,
+    saveChannel,
+    unsaveChannel,
+    writeComment,
+    editComment,
+    deleteComment,
+}
+ 
