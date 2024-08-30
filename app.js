@@ -1,15 +1,17 @@
 const dataService = require('./database/dataService.js');
 const advData = require('./database/advDataFuncs.js')
+const { ObjectId } = require('mongodb');
 const { getClient, closeConnection } = require('./database/db.js')
 const { retryApiCall, accessSecret } = require('./utils/apiutils.js');
 
 async function main(){
 
     // await advData.createChannel('Main4', 'A test channel', 'userId1')
-    // await advData.createUser('userId14')
+    // await advData.writeComment('THIS IS A TEST COMMENT PLEASE IGNORE', 'userId15', 'postId3')
     // await advData.writeComment('This is a test comment', 'userId12', 'postId1')
-    // await advData.toggleVote()
-    await advData.toggleSave('userId14', 'postId1', 'Posts')
+    // await advData.createUser('userId15')
+    // await advData.toggleVote(null, 'userId15', 'commentId2', 'Comment Votes', 'Comments', 'Downvote')
+    await advData.toggleSave('userId14', 'channelId1', 'Channels')
     // const id = 'userId1'
     // const results = await advData.getDataForUserFeed(id)
     // console.log(results)
