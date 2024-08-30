@@ -147,3 +147,5 @@ router.get('/getDataForDefaultFeed', async (req, res) => {
         res.status(500).json({ error: 'An error occurred while getting the default feed.' });
     }
 });
+
+module.exports = router

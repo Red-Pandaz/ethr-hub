@@ -54,10 +54,19 @@ async function getDataForUserFeed(uid){
     }
 
 console.log(userFeed)
+return userFeed
 }
 
 async function getDataForDefaultFeed(){
+    const posts = await dataService.findDocumentsByIndex(
+        'Posts',
+        {
+            channel: 'channelId1'
+        }
 
+    )
+    console.log(posts)
+    return posts
 }
 
 async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction){

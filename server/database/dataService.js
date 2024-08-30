@@ -1,19 +1,12 @@
 const dbName = 'EthrHub'
 const { getClient } = require('./db');
-
-//TODO: Create good test data set. 1 channel, 10 users, 3 posts, 5 comments and 3 comment replies, 5 post votes, 5 comment votes
-//Try rendering in react
-//Set up Express server
-//Ethereum authentication
-//Domain
-//Digital Ocean Droplet
-
+const { retryApiCall } = require('./utils/apiutils.js');
 
 async function getCollection(collectionName){
     try {
-        const db = await getClient();
+        const db = await retryApiCall(getClient());
         const collection = db.collection(collectionName);
-        const documents = await collection.find({}).toArray();
+        const documents = await retryApiCall(collection.find({}).toArray())
         return documents
     } catch (err) {
         console.error(`Error retrieving ${collectionName}`, err);
