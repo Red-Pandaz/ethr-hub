@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const advData = require('./database/advDataFuncs.js');
+const advData = require('../database/advDataFuncs.js');
 
 router.post('/toggleSave', async (req, res) => {
     try {

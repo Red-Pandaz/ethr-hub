@@ -361,7 +361,6 @@ async function editPost(newPostText, pid){
         {
             modifiedAt: new Date(),
             text: newPostText
-
         }
     )
 
@@ -369,12 +368,13 @@ async function editPost(newPostText, pid){
 
 //MAKE SURE TO ADD LOGIC FOR DELETING POSTID FROM USER AND CHANNEL
 async function deletePost(cid, uid, pid){
-    await dataService.deleteDocumentById(
+    const deletedPost = await dataService.deleteDocumentById(
         'Posts',
         pid
     )
     await dataService.addToDocumentArray('Users', uid, 'posts', pid)
     await dataService.addToDocumentArray('Channels', cid, 'cposts', pid)
+    return deletedPost
 }
 
 async function createChannel(channelName, channelDescription, uid){
@@ -399,8 +399,8 @@ async function createChannel(channelName, channelDescription, uid){
             }
         const newChannel = await dataService.createDocument('Channels', newChannelObj)
         const newChannelId = newChannel.insertedId.toString()
-        console.log(newChannelId)
         await dataService.addToDocumentArray('Users', uid, 'savedChannels', newChannelId)
+        return newChannel
         }
 }
 
@@ -440,7 +440,8 @@ async function createUser(ethAddress){
             ensName: null
           }
         
-          await dataService.createDocument('Users', newUserObj)
+        const newUser =  await dataService.createDocument('Users', newUserObj)
+        return newUser
     }
 
 }

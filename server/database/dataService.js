@@ -1,6 +1,6 @@
 const dbName = 'EthrHub'
 const { getClient } = require('./db');
-const { retryApiCall } = require('./utils/apiutils.js');
+const { retryApiCall } = require('../utils/apiutils.js');
 
 async function getCollection(collectionName){
     try {
