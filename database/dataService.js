@@ -25,6 +25,7 @@ async function createDocument(collectionName, entry){
         const db = await getClient();
         const collection = db.collection(collectionName);
         const result = await collection.insertOne(entry)
+        console.log(result)
         console.log(`New ${collectionName} entry added`)
         return result
     } catch (err) {
@@ -79,7 +80,7 @@ async function updateDocumentById(collectionName, documentId, updateData) {
             { returnOriginal: false }
         );
         
-        console.log("Updated document:", result.value);
+        console.log("Updated document:", result);
     } catch (err) {
         console.error("Error updating document:", err);
     }
