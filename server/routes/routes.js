@@ -116,9 +116,9 @@ router.post('/createUser', async (req, res) => {
 });
 
 
-router.get('/getDataForPostPage', async (req, res) => {
+router.get('/posts/:postId', async (req, res) => {
     try {
-        const { postId } = req.query;
+        const { postId } = req.params;
         const result = await advData.getDataForPostPage(postId)
         res.status(200).json(result);
     } catch (err) {
