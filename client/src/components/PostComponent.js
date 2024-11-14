@@ -30,16 +30,10 @@ const Post = () => {
           
             {/* Render your data here */}
                 <div key={postId}>
-                    <h4>{data.post.title}</h4>
+                    <h4>{data.post.title}</h4> <span>Created By {data.post.createdBy}</span>
                     <p>{data.post.text}</p>
+                    <span>{data.post.votes.upvotes.length} Upvotes</span> <span>{data.post.votes.downvotes.length} Downvotes</span>
 
-                </div>
-                <div>
-                {data.comments.map(comment => (
-                    <p>
-                        {comment.text}
-                    </p>
-                ))} 
                 </div>
         </div>
     );

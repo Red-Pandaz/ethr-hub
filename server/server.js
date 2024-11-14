@@ -1,7 +1,7 @@
 // server.js
 const express = require('express');
 const path = require('path');
-const routes = require('./routes/routes'); // Your API routes
+const routes = require('./routes/routes');
 const cors = require('cors');
 
 const app = express();

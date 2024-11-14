@@ -1,6 +1,18 @@
 const dataService = require('./dataService.js');
 const { ObjectId } = require('mongodb');
 
+
+async function checkExistingVote(voteType, idType, uid, itemId){
+    const results = await dataService.findOneDocumentByIndex(
+        voteType,
+        {
+            [idType]: itemId,
+            userId: uid
+        }
+    )
+    console.log(results)
+    return results
+}
 async function getDataForPostPage(pid){
     const results = {}
     results.post = await dataService.findOneDocumentByIndex(
@@ -69,6 +81,18 @@ async function getDataForDefaultFeed(){
     return posts
 }
 
+async function getDataForChannelFeed(channelId){
+    const posts = await dataService.findDocumentsByIndex(
+        'Posts',
+        {
+            channel: channelId
+        }
+
+    )
+    console.log(posts)
+    return posts
+}
+
 async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction){
     if(!voteId){
         const newVoteObj = {};
@@ -88,26 +112,30 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction){
         if(userAction === 'Upvote'){
             newVoteObj.hasUpvoted = true;
             newVoteObj.hasDownvoted = false;
-            //change vote tally on item document
-            await dataService.addToDocumentArray(itemType, itemId, 'votes.upvotes', uid)
+           
         } else if(userAction === 'Downvote'){
             newVoteObj.hasUpvoted = false;
             newVoteObj.hasDownvoted = true
-            //change vote tally on item document
-            await dataService.addToDocumentArray(itemType, itemId, 'votes.downvotes', uid)
+        
         }
         const newVote = await dataService.createDocument(voteType, newVoteObj);
-        if(newVote.hasUpvoted){
+        const newVoteId = newVote.insertedId.toString();
+        if(newVoteObj.hasUpvoted){
+            console.log('upvote')
+            const newUpvote = await dataService.addToDocumentArray(itemType, itemId, 'votes.upvotes', newVoteId)
+            console.log(newUpvote)
             if(itemType === 'Posts'){
-                await dataService.addToDocumentArray('Users', uid, 'votes.posts.upvotes', newVote._id)
+                await dataService.addToDocumentArray('Users', uid, 'votes.posts.upvotes',newVoteId)
             }else if(itemType === 'Comments'){
-                await dataService.addToDocumentArray('Users', uid, 'votes.comments.upvotes', newVote._id)
+                await dataService.addToDocumentArray('Users', uid, 'votes.comments.upvotes', newVoteId)
             }
-        } else if (newVote.hasDownvoted){
+        } else if (newVoteObj.hasDownvoted){
+            console.log('downvote')
+           const newDownvote= await dataService.addToDocumentArray(itemType, itemId, 'votes.downvotes', newVoteId)
             if(itemType === 'Posts'){
-                await dataService.addToDocumentArray('Users', uid, 'votes.posts.downvotes', newVote._id)
+                await dataService.addToDocumentArray('Users', uid, 'votes.posts.downvotes', newVoteId)
             }else if(itemType === 'Comments'){
-                await dataService.addToDocumentArray('Users', uid, 'votes.comments.downvotes', newVote._id)
+                await dataService.addToDocumentArray('Users', uid, 'votes.comments.downvotes', newVoteId)
             }
         }
 
@@ -125,7 +153,6 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction){
     console.log(hasUpvoted)
     console.log(hasDownvoted)
     if(!hasDownvoted){
-        console.log('yerp')
     }
 
     if(!hasUpvoted && !hasDownvoted){
@@ -137,7 +164,7 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction){
                     hasUpvoted: true,
                 }
             );
-            await dataService.addToDocumentArray(itemType, itemId, 'votes.upvotes', uid)
+            await dataService.addToDocumentArray(itemType, itemId, 'votes.upvotes', voteId)
             if(itemType === 'Posts'){
                 await dataService.addToDocumentArray('Users', uid, 'votes.posts.upvotes', voteId)
             }else if(itemType === 'Comments'){
@@ -155,7 +182,7 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction){
                     hasDownvoted: true,
                 }
             );
-            await dataService.addToDocumentArray(itemType, itemId, 'votes.downvotes', uid)
+            await dataService.addToDocumentArray(itemType, itemId, 'votes.downvotes', voteId)
             if(itemType === 'Posts'){
                 await dataService.addToDocumentArray('Users', uid, 'votes.posts.downvotes', voteId)
             }else if(itemType === 'Comments'){
@@ -176,7 +203,7 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction){
                 }
             );
             console.log(voteUpdate)
-            await dataService.removeFromDocumentArray(itemType, itemId, 'votes.upvotes', uid)
+            await dataService.removeFromDocumentArray(itemType, itemId, 'votes.upvotes', voteId)
             if(itemType === 'Posts'){
                 await dataService.removeFromDocumentArray('Users', uid, 'votes.posts.upvotes', voteId)
             }else if(itemType === 'Comments'){
@@ -197,11 +224,11 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction){
             await dataService.addToDocumentArray(itemType, itemId, 'votes.downvotes', uid)
             await dataService.removeFromDocumentArray(itemType, itemId, 'votes.upvotes', uid)
             if(itemType === 'Posts'){
-                await dataService.addToDocumentArray('Users', uid, 'votes.posts.downvotes', newVote._id)
-                await dataService.removeFromDocumentArray('Users', uid, 'votes.posts.upvotes', newVote._id)
+                await dataService.addToDocumentArray('Users', uid, 'votes.posts.downvotes', voteId)
+                await dataService.removeFromDocumentArray('Users', uid, 'votes.posts.upvotes', voteId)
             }else if(itemType === 'Comments'){
-                await dataService.addToDocumentArray('Users', uid, 'votes.comments.downvotes', newVote._id)
-                await dataService.removeFromDocumentArray('Users', uid, 'votes.comments.upvotes', newVote._id)
+                await dataService.addToDocumentArray('Users', uid, 'votes.comments.downvotes',  voteId)
+                await dataService.removeFromDocumentArray('Users', uid, 'votes.comments.upvotes', voteId)
             }
         }
 
@@ -216,8 +243,8 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction){
                     hasDownvoted: false
                 }
             );
-            await dataService.addToDocumentArray(itemType, itemId, 'votes.upvotes', uid)
-            await dataService.removeFromDocumentArray(itemType, itemId, 'votes.downvotes', uid)
+            await dataService.addToDocumentArray(itemType, itemId, 'votes.upvotes', voteId)
+            await dataService.removeFromDocumentArray(itemType, itemId, 'votes.downvotes', voteId)
             if(itemType === 'Posts'){
                 await dataService.addToDocumentArray('Users', uid, 'votes.posts.upvotes', voteId)
                 await dataService.removeFromDocumentArray('Users', uid, 'votes.posts.downvotes', voteId)
@@ -237,7 +264,7 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction){
                 }
             );
                 
-            await dataService.removeFromDocumentArray(itemType, itemId, 'votes.downvotes', uid)
+            await dataService.removeFromDocumentArray(itemType, itemId, 'votes.downvotes', voteId)
             if(itemType === 'Posts'){
                 await dataService.addToDocumentArray('Users', uid, 'votes.posts.downvotes', voteId)
             }else if(itemType === 'Comments'){
@@ -460,6 +487,8 @@ module.exports = {
     deletePost,
     createChannel,
     createUser,
-    toggleSave
+    toggleSave,
+    checkExistingVote,
+    getDataForChannelFeed
 }
  

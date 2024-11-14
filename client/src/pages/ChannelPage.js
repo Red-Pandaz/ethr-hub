@@ -3,19 +3,19 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 
 import Post from '../components/PostComponent';
-import CommentList from '../components/CommentListComponent';
 import { CreatePostForm } from '../components/CreatePostComponent'; // Import the CreatePostForm component
 
 import ButtonDisplay from '../components/ActionButtons'; // Import the ButtonDisplay component
 
-const PostPage = () => {
+const ChannelPage = () => {
     const [isFormVisible, setIsFormVisible] = useState(false);
-    const { postId, channelId } = useParams();
+    const { channelId } = useParams();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
+    console.log('channelId: ' + channelId)
 
     useEffect(() => {
-        axios.get(`http://localhost:5000/api/posts/${postId}`) 
+        axios.get(`http://localhost:5000/api/channels/${channelId}`) 
             .then(response => {
                 setData(response.data);
                 setLoading(false);
@@ -24,33 +24,35 @@ const PostPage = () => {
                 console.error('Error fetching data:', error);
                 setLoading(false);
             });
-    }, [postId]);
+    }, [channelId]);
 
     if (loading) return <p>Loading...</p>;
     if (!data) return <p>No data found</p>;
+    
+    const handlePostSubmit = async (extraParam) => {
+        try {
+            await axios.post('https://localhost:5000/api/writePost', {
+                postTitle: extraParam.postTitle,
+                postText: extraParam.postText,
+                userId: extraParam.userId,
+                channelId: extraParam.channelId
+            });
+      
+            setIsFormVisible(false); // Hide the form after submission
+        } catch (error) {
+            console.error('Error submitting post:', error);
+        }
+    };
 
     return (
-        <div>
-            <Post />
             <div>
-                {/* Example buttons to change the type */}
                 <ButtonDisplay 
-                    type={'upvotePost'} 
-                    extraParam={{ userId: 'userId5', itemId: postId }} 
+                    type="createPost" 
+                    extraParam={{ userId: 'userId5', channelId: channelId, postTitle: '', postText: '' }} 
+                    onClick={() => setIsFormVisible(true)} 
                 />
-                <ButtonDisplay 
-                    type={'downvotePost'} 
-                    extraParam={{ userId: 'userId5', itemId: postId }} 
-                />
-                <ButtonDisplay
-                type="createComment"
-                />
-
-     
             </div>
-            {data && data.comments && <CommentList comments={data.comments} />}
-        </div>
     );
 };
 
-export default PostPage;
+export default ChannelPage;

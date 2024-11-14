@@ -1,4 +1,5 @@
 const { SecretManagerServiceClient } = require('@google-cloud/secret-manager');
+const { ethers } = require('ethers');
 
 async function retryApiCall(apiCall, maxRetries = 5, delayBetweenRetries = 1000) {
     let retries = 0;
@@ -36,4 +37,10 @@ async function accessSecret(secretName) {
     }
   }
 
-  module.exports = { retryApiCall, accessSecret }
+  // Verify message and signature
+function verifySignature(message, signature, address) {
+    const signerAddress = ethers.utils.verifyMessage(message, signature);
+    return signerAddress.toLowerCase() === address.toLowerCase();
+  }
+
+  module.exports = { retryApiCall, accessSecret, verifySignature }
