@@ -4,9 +4,9 @@ import { useParams } from 'react-router-dom';
 
 import Post from '../components/PostComponent';
 import CommentList from '../components/CommentListComponent';
-import { CreatePostForm } from '../components/CreatePostComponent'; // Import the CreatePostForm component
+import { CreatePostForm } from '../components/CreatePostComponent';
 
-import ButtonDisplay from '../components/ActionButtons'; // Import the ButtonDisplay component
+import ButtonDisplay from '../components/ActionButtons';
 
 const PostPage = () => {
     const [isFormVisible, setIsFormVisible] = useState(false);

@@ -37,10 +37,17 @@ async function accessSecret(secretName) {
     }
   }
 
-  // Verify message and signature
+
 function verifySignature(message, signature, address) {
     const signerAddress = ethers.utils.verifyMessage(message, signature);
     return signerAddress.toLowerCase() === address.toLowerCase();
   }
+
+  async function checkEnsName(address){
+    const INFURA_URI = await retryApiCall(() => accessSecret('INFURA_URI'));
+    console.log(INFURA_URI);
+
+  }
+  checkEnsName('test')
 
   module.exports = { retryApiCall, accessSecret, verifySignature }

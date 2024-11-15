@@ -400,7 +400,7 @@ async function deletePost(cid, uid, pid){
         pid
     )
     await dataService.addToDocumentArray('Users', uid, 'posts', pid)
-    await dataService.addToDocumentArray('Channels', cid, 'cposts', pid)
+    await dataService.addToDocumentArray('Channels', cid, 'posts', pid)
     return deletedPost
 }
 

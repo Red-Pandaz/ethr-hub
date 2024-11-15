@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+// src/pages/Login.js
+import React, { useEffect } from 'react';
 import { ethers } from 'ethers';
+import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
-  const [userAddress, setUserAddress] = useState(null);
-  const [isConnected, setIsConnected] = useState(false);
+  const { userAddress, isConnected, login, logout } = useAuth();
 
   useEffect(() => {
     checkIfWalletIsConnected();
@@ -16,8 +17,11 @@ const Login = () => {
         const accounts = await provider.listAccounts();
 
         if (accounts.length > 0) {
-          setUserAddress(accounts[0]);
-          setIsConnected(true);
+          const userAddress = accounts[0];
+          const token = localStorage.getItem('authToken');
+          if (token) {
+            login(userAddress, token); // Set user as authenticated if token exists
+          }
         }
       } catch (err) {
         console.error('Error connecting to MetaMask:', err);
@@ -32,30 +36,26 @@ const Login = () => {
       alert('MetaMask is not installed. Please install MetaMask and try again.');
       return;
     }
-
+  
     try {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
       if (accounts && accounts[0]) {
         const userAddress = accounts[0];
-        setUserAddress(userAddress);
-        setIsConnected(true);
-
         const message = "Please sign this message to log in";
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
         const signature = await signer.signMessage(message);
-
+  
         const response = await fetch('http://localhost:5000/api/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ address: userAddress, signature, message })
         });
-
+  
         const data = await response.json();
         if (data.token) {
-            console.log(data.token)
-          localStorage.setItem('authToken', data.token);
-          console.log('Login successful!');
+          login(userAddress, data.token); // Call AuthContext's login
+          console.log('Login successful!', data.token);
         } else {
           console.error('Login failed:', data.error);
         }
@@ -66,11 +66,10 @@ const Login = () => {
       console.error('Error connecting to MetaMask:', err);
     }
   };
+  
 
   const disconnectWallet = () => {
-    setUserAddress(null);
-    setIsConnected(false);
-    localStorage.removeItem('authToken'); // Remove JWT on logout
+    logout(); // Call AuthContext's logout
   };
 
   return (
