@@ -3,7 +3,7 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const advData = require('../database/advDataFuncs.js');
 const { verifySignature } = require ('../utils/apiutils.js')
-const { verifyToken } = require('../middleware/auth');
+const authenticateJWT = require('../middleware/authMiddleware.js');
 
 const JWT_SECRET = 'thisIsJustATestToken'
 
@@ -28,12 +28,14 @@ router.get('/checkExistingVote', async (req, res) => {
         res.status(500).json({ error: 'An error occurred while toggling the save.' });
     }
 });
-router.post('/toggleVote', verifyToken, async (req, res) => {
+router.post('/toggleVote', authenticateJWT, async (req, res) => {
     const { voteId, itemId, voteType, itemType, userAction } = req.body;
     const userId = req.userId;
 
-    if (userId !== req.body.userId) {
-        return res.status(403).json({ error: 'You can only vote with your own address' });
+    if (userId.toLowerCase() !== req.body.userId.toLowerCase()) {
+        console.log("user id", userId.toLowerCase())
+        console.log(req.body.userId.toLowerCase())
+        return res.status(403).json({ error: `You can only vote with your own address ${userId} ${req.body.userId}` });
     }
 
     try {
@@ -79,22 +81,29 @@ router.post('/deletePost', async (req, res) => {
 });
 
 
-router.post('/writeComment', verifyToken, async (req, res) => {
-    const { commentText, postId, userId } = req.body;
-    const loggedInUserId = req.userId;
-    if (loggedInUserId !== userId) {
-        return res.status(403).json({ error: 'You can only comment with your own address' });
+router.post('/writeComment', authenticateJWT, async (req, res) => {
+    const { commentText, postId, parentId, userId } = req.body; // Add parentId here
+    const loggedInUserId = req.userId; // Extract authenticated user
+
+    // Check if the user ID from the token matches the user ID in the request body
+    if (loggedInUserId.toLowerCase() !== userId.toLowerCase()) {
+        console.log("Authenticated user ID:", loggedInUserId.toLowerCase());
+        console.log("Request body user ID:", userId.toLowerCase());
+        return res.status(403).json({ error: `You can only write comments with your own address: ${loggedInUserId} !== ${userId}` });
     }
 
+    console.log('Authenticated user ID from token:', loggedInUserId);  // Log the userId
+    console.log('Received request body:', { commentText, postId, parentId });
+
     try {
-        const result = await advData.writeComment(commentText, loggedInUserId, postId);
+        // Call writeComment with parentId (default null for post-level comments)
+        const result = await advData.writeComment(commentText, loggedInUserId, postId, parentId || null);
         res.status(200).json(result);
     } catch (err) {
         console.error('Error writing comment:', err);
-        res.status(500).json({ error: 'An error occurred while writing the comment.' });
+        res.status(500).json({ error: `An error occurred while writing the comment: ${err.message}` });
     }
 });
-
 router.post('/editComment', async (req, res) => {
     try {
         const { newCommentText, commentId } = req.body;

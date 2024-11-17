@@ -45,9 +45,22 @@ function verifySignature(message, signature, address) {
 
   async function checkEnsName(address){
     const INFURA_URI = await retryApiCall(() => accessSecret('INFURA_URI'));
-    console.log(INFURA_URI);
+    console.log(ethers)
+    const provider = new ethers.providers.JsonRpcProvider(INFURA_URI)
+    try {
+      const ensName = await provider.lookupAddress(address);
+
+      if (ensName) {
+          console.log(`The address ${address} resolves to the ENS name: ${ensName}`);
+      } else {
+          console.log(`The address ${address} does not have an associated ENS name`);
+      }
+      return ensName
+  } catch (error) {
+      console.error('Error performing reverse lookup:', error);
+  }
 
   }
-  checkEnsName('test')
 
-  module.exports = { retryApiCall, accessSecret, verifySignature }
+
+  module.exports = { retryApiCall, accessSecret, verifySignature, checkEnsName }

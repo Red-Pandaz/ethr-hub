@@ -1,17 +1,15 @@
 const dataService = require('./dataService.js');
 const { ObjectId } = require('mongodb');
-
+const { checkEnsName }= require('../utils/apiutils.js')
 
 async function checkExistingVote(voteType, idType, uid, itemId){
+    console.log('Checking existing vote with:', { voteType, idType, uid, itemId });
     const results = await dataService.findOneDocumentByIndex(
         voteType,
-        {
-            [idType]: itemId,
-            userId: uid
-        }
-    )
-    console.log(results)
-    return results
+        { [idType]: itemId, userId: uid.toLowerCase() }
+    );
+    console.log('Found existing vote:', results);
+    return results;
 }
 async function getDataForPostPage(pid){
     const results = {}
@@ -94,6 +92,8 @@ async function getDataForChannelFeed(channelId){
 }
 
 async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction){
+    console.log('Toggle Vote Params:', { voteId, uid, itemId, voteType, itemType, userAction });
+
     if(!voteId){
         const newVoteObj = {};
         newVoteObj.userId = uid;
@@ -432,7 +432,7 @@ async function createChannel(channelName, channelDescription, uid){
 }
 
 async function createUser(ethAddress){
-    console.log(ethAddress)
+
     const userCheck = await dataService.findOneDocumentByIndex(
         'Users',
         {
@@ -445,6 +445,7 @@ async function createUser(ethAddress){
         console.log('User already exists')
         return
     } else{
+        const ensName = await checkEnsName(ethAddress)
         const newUserObj = {
             _id: ethAddress,
             savedChannels: ["channelId1"],
@@ -464,13 +465,29 @@ async function createUser(ethAddress){
             comments: [],
             createdAt: new Date(),
             lastLogin: new Date(),
-            ensName: null
+            ensName: ensName
           }
         
         const newUser =  await dataService.createDocument('Users', newUserObj)
         return newUser
     }
 
+}
+async function getUserByAddress(ethAddress) {
+    try {
+        const user = await dataService.findOneDocumentByIndex('Users', {
+            _id: ethAddress
+        });
+
+        if (!user) {
+            return null
+        }
+
+        return user;
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        throw error;  
+    }
 }
 
 
@@ -489,6 +506,7 @@ module.exports = {
     createUser,
     toggleSave,
     checkExistingVote,
-    getDataForChannelFeed
+    getDataForChannelFeed,
+    getUserByAddress
 }
  
