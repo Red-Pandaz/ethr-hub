@@ -47,10 +47,16 @@ router.post('/toggleVote', authenticateJWT, async (req, res) => {
     }
 });
 
-router.post('/writePost', async (req, res) => {
+router.post('/writePost', authenticateJWT, async (req, res) => {
+    const { postText, postTitle, userId, channelId } = req.body;
+    const loggedInUserId = req.userId; // Extract authenticated user
+
+    if (loggedInUserId.toLowerCase() !== userId.toLowerCase()) {
+        return res.status(403).json({ error: `You can only write posts with your own address: ${loggedInUserId} !== ${userId}` });
+    }
+
     try {
-        const { postText, postTitle, userId, channelId } = req.body;
-        const result = await advData.writePost(postText, postTitle, userId, channelId);
+        const result = await advData.writePost(postText, postTitle, loggedInUserId, channelId);
         res.status(200).json(result);
     } catch (err) {
         console.error('Error writing post:', err);
@@ -58,9 +64,15 @@ router.post('/writePost', async (req, res) => {
     }
 });
 
-router.post('/editPost', async (req, res) => {
+router.post('/editPost', authenticateJWT, async (req, res) => {
+    const { newPostText, postId, userId } = req.body;
+    const loggedInUserId = req.userId; // Extract authenticated user
+
+    if (loggedInUserId.toLowerCase() !== userId.toLowerCase()) {
+        return res.status(403).json({ error: `You can only edit your own posts: ${loggedInUserId} !== ${userId}` });
+    }
+
     try {
-        const { newPostText, postId } = req.body;
         const result = await advData.editPost(newPostText, postId);
         res.status(200).json(result);
     } catch (err) {
@@ -69,10 +81,17 @@ router.post('/editPost', async (req, res) => {
     }
 });
 
-router.post('/deletePost', async (req, res) => {
+
+router.post('/deletePost', authenticateJWT, async (req, res) => {
+    const { channelId, userId, postId } = req.body;
+    const loggedInUserId = req.userId; // Extract authenticated user
+
+    if (loggedInUserId.toLowerCase() !== userId.toLowerCase()) {
+        return res.status(403).json({ error: `You can only delete your own posts: ${loggedInUserId} !== ${userId}` });
+    }
+
     try {
-        const { channelId, userId, postId } = req.body;
-        const result = await advData.deletePost(channelId, userId, postId);
+        const result = await advData.deletePost(channelId, loggedInUserId, postId);
         res.status(200).json(result);
     } catch (err) {
         console.error('Error deleting post:', err);
@@ -104,10 +123,17 @@ router.post('/writeComment', authenticateJWT, async (req, res) => {
         res.status(500).json({ error: `An error occurred while writing the comment: ${err.message}` });
     }
 });
-router.post('/editComment', async (req, res) => {
+
+router.post('/editComment', authenticateJWT, async (req, res) => {
+    const { newCommentText, commentId, userId } = req.body;
+    const loggedInUserId = req.userId; 
+
+    if (loggedInUserId.toLowerCase() !== userId.toLowerCase()) {
+        return res.status(403).json({ error: `You can only edit your own comments: ${loggedInUserId} !== ${userId}` });
+    }
+
     try {
-        const { newCommentText, commentId } = req.body;
-        const result = await advData.editComment(newCommentText, commentId )
+        const result = await advData.editComment(newCommentText, commentId);
         res.status(200).json(result);
     } catch (err) {
         console.error('Error editing comment:', err);
@@ -115,17 +141,23 @@ router.post('/editComment', async (req, res) => {
     }
 });
 
-router.post('/deleteComment', async (req, res) => {
+
+router.post('/deleteComment', authenticateJWT, async (req, res) => {
+    const { commentId, userId, postId } = req.body;
+    const loggedInUserId = req.userId; 
+
+    if (loggedInUserId.toLowerCase() !== userId.toLowerCase()) {
+        return res.status(403).json({ error: `You can only delete your own comments: ${loggedInUserId} !== ${userId}` });
+    }
+
     try {
-        const { commentId, userId, postId } = req.body;
-        const result = await advData.deleteComment(commentId, userId, postId)
+        const result = await advData.deleteComment(commentId, userId, postId);
         res.status(200).json(result);
     } catch (err) {
         console.error('Error deleting comment:', err);
         res.status(500).json({ error: 'An error occurred while deleting the comment.' });
     }
 });
-
 
 router.post('/createChannel', async (req, res) => {
     try {
