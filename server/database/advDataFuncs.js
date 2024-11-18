@@ -315,10 +315,11 @@ async function toggleSave(uid, itemId, itemType){
 }
 
 
-async function writeComment(commentText, uid, pid, replyToId){
+async function writeComment(commentText, uid, pid, replyToId, ensName){
     const commentObj = {
         postId: pid,
         userId: uid,
+        ensName: ensName,
         text: commentText,
         parentId: replyToId,
         createdAt: new Date(),
@@ -362,7 +363,7 @@ async function deleteComment(cid, uid, pid){
     await dataService.removeFromDocumentArray('Posts', pid, 'comments', cid)
 }
 
-async function writePost(postText, postTitle, uid, cid){
+async function writePost(postText, postTitle, uid, cid, ensName){
     const newPostObj = 
     {
         channel: cid,
@@ -375,6 +376,7 @@ async function writePost(postText, postTitle, uid, cid){
         },
         comments: [],
         createdBy: uid,
+        ensName: ensName,
         createdAt: new Date(),
         modifiedAt: new Date(),
       }

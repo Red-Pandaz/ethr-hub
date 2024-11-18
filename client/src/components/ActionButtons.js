@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Button from "./Button"; // Import the Button component
 import axios from "axios"; // Import axios for making API calls
 import { useAuth } from "../context/AuthContext";
-import apiClient from '../utils/apiClient.jsx'
+import apiClient from '../utils/apiClient'
 
 const ButtonDisplay = ({ type, extraParam, onClick }) => {
   const { userAddress } = useAuth(); // Access userAddress from AuthContext
@@ -240,8 +240,9 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
 
           case "reply": {
             try {
-              const { commentText, postId, parentId } = extraParam;
+              const { commentText, postId, parentId, ensName } = extraParam;
           
+              // Ensure commentText and postId are provided
               if (!commentText || !postId) {
                 console.error("Missing required parameters for replying:", { commentText, postId });
                 return;
@@ -253,13 +254,18 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
                 return;
               }
           
+              // Prepare the data for the API call
+              const requestData = {
+                commentText, // Text of the reply
+                postId,      // The ID of the post
+                parentId: parentId || null, // Ensure parentId is passed as null for top-level comments
+                ensName: ensName || null,   // Optional: If ensName is not provided, default to null
+              };
+          
+              // Send the API request to create the comment
               const response = await apiClient.post(
-                "http://localhost:5000/api/writeComment",
-                {
-                  commentText, // Text of the reply
-                  postId,      // The ID of the post
-                  parentId,    // Null for post replies, comment ID for comment replies
-                },
+                "http://localhost:5000/api/writeComment", 
+                requestData,
                 {
                   headers: {
                     Authorization: `Bearer ${authToken}`,
@@ -267,12 +273,19 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
                 }
               );
           
+              // Handle successful response
               console.log("Reply created successfully:", response.data);
             } catch (error) {
-              console.error("Error creating reply:", error.response?.data || error.message);
+              // Handle errors more specifically
+              if (error.response) {
+                console.error("Error creating reply:", error.response.data); // Error from the API
+              } else {
+                console.error("Error creating reply:", error.message); // General error (e.g., network)
+              }
             }
             break;
           }
+          
           
 
         case "createPost": {

@@ -101,7 +101,7 @@ router.post('/deletePost', authenticateJWT, async (req, res) => {
 
 
 router.post('/writeComment', authenticateJWT, async (req, res) => {
-    const { commentText, postId, parentId, userId } = req.body; // Add parentId here
+    const { commentText, postId, parentId, userId, ensName } = req.body; // Add parentId here
     const loggedInUserId = req.userId; // Extract authenticated user
 
     // Check if the user ID from the token matches the user ID in the request body
@@ -116,7 +116,7 @@ router.post('/writeComment', authenticateJWT, async (req, res) => {
 
     try {
         // Call writeComment with parentId (default null for post-level comments)
-        const result = await advData.writeComment(commentText, loggedInUserId, postId, parentId || null);
+        const result = await advData.writeComment(commentText, loggedInUserId, postId, parentId, ensName || null);
         res.status(200).json(result);
     } catch (err) {
         console.error('Error writing comment:', err);
@@ -282,5 +282,23 @@ router.post('/verify-token', (req, res) => {
       res.status(401).json({ valid: false });
     }
   });
+
+// Route to get ENS name by Ethereum address
+router.get("/ensname/:address", async (req, res) => {
+    const { address } = req.params; 
+    try {
+      const user = await advData.getUserByAddress(address.toLowerCase());
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      return res.json({ ensName: user.ensName });
+    } catch (error) {
+      console.error("Error retrieving ENS name:", error);
+      return res.status(500).json({ message: "Server error" });
+    }
+  });
+  
+
+
 
 module.exports = router
