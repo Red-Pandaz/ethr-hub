@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import Button from "./Button"; // Import the Button component
 import axios from "axios"; // Import axios for making API calls
 import { useAuth } from "../context/AuthContext";
+import apiClient from '../utils/apiClient.jsx'
 
 const ButtonDisplay = ({ type, extraParam, onClick }) => {
   const { userAddress } = useAuth(); // Access userAddress from AuthContext
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const [formContent, setFormContent] = useState(""); // Form state for comments
   const handleClick = async () => {
     // Retrieve the authToken from localStorage
     const authToken = localStorage.getItem("authToken");
@@ -44,7 +46,7 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
 
             try {
               // Check if a vote exists
-              const doesVoteExist = await axios.get(
+              const doesVoteExist = await apiClient.get(
                 `http://localhost:5000/api/checkExistingVote`,
                 {
                   headers: {
@@ -65,7 +67,7 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
               let vid = existingVote ? existingVote._id : null;
 
               // Toggle the vote
-              const response = await axios.post(
+              const response = await apiClient.post(
                 "http://localhost:5000/api/toggleVote",
                 {
                   voteId: vid,
@@ -115,7 +117,7 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
 
             try {
               // Check if a vote exists
-              const doesVoteExist = await axios.get(
+              const doesVoteExist = await apiClient.get(
                 `http://localhost:5000/api/checkExistingVote`,
                 {
                   headers: {
@@ -136,7 +138,7 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
               let vid = existingVote ? existingVote._id : null;
 
               // Toggle the vote
-              const response = await axios.post(
+              const response = await apiClient.post(
                 "http://localhost:5000/api/toggleVote",
                 {
                   voteId: vid,
@@ -162,7 +164,7 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
 
         case "upvoteComment":
           {
-            const doesVoteExist = await axios.get(
+            const doesVoteExist = await apiClient.get(
               `http://localhost:5000/api/checkExistingVote?voteType=Comment%20Votes&idType=commentId&uid=${userAddress}&itemId=${extraParam.itemId}`,
               {
                 headers: {
@@ -179,7 +181,7 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
               vid = null;
             }
 
-            response = await axios.post(
+            response = await apiClient.post(
               "http://localhost:5000/api/toggleVote",
               {
                 voteId: vid,
@@ -200,7 +202,7 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
 
         case "downvoteComment":
           {
-            const doesVoteExist = await axios.get(
+            const doesVoteExist = await apiClient.get(
               `http://localhost:5000/api/checkExistingVote?voteType=Comment%20Votes&idType=commentId&uid=${userAddress}&itemId=${extraParam.itemId}`,
               {
                 headers: {
@@ -217,7 +219,7 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
               vid = null;
             }
 
-            response = await axios.post(
+            response = await apiClient.post(
               "http://localhost:5000/api/toggleVote",
               {
                 voteId: vid,
@@ -236,48 +238,42 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
           }
           break;
 
-        case "replyToPost": {
-          try {
-            response = await axios.post(
-              "http://localhost:5000/api/writeComment",
-              {
-                commentText: extraParam.commentText, // Text of the comment
-                postId: extraParam.postId, // The ID of the post
-                parentId: null, // No parent for post-level comments
-              },
-              {
-                headers: {
-                  Authorization: `Bearer ${authToken}`,
-                },
+          case "reply": {
+            try {
+              const { commentText, postId, parentId } = extraParam;
+          
+              if (!commentText || !postId) {
+                console.error("Missing required parameters for replying:", { commentText, postId });
+                return;
               }
-            );
-            console.log("Post-level comment created:", response.data);
-          } catch (error) {
-            console.error("Error creating post-level comment:", error);
-          }
-          break;
-        }
-        case "replyToComment": {
-          try {
-            response = await axios.post(
-              "http://localhost:5000/api/writeComment",
-              {
-                commentText: extraParam.commentText, // Text of the reply
-                postId: extraParam.postId, // The ID of the post the comment belongs to
-                parentId: extraParam.parentId, // Parent comment's ID
-              },
-              {
-                headers: {
-                  Authorization: `Bearer ${authToken}`,
-                },
+          
+              // Ensure authToken exists
+              if (!authToken) {
+                console.error("User is not authorized. Missing auth token.");
+                return;
               }
-            );
-            console.log("Comment reply created:", response.data);
-          } catch (error) {
-            console.error("Error creating comment reply:", error);
+          
+              const response = await apiClient.post(
+                "http://localhost:5000/api/writeComment",
+                {
+                  commentText, // Text of the reply
+                  postId,      // The ID of the post
+                  parentId,    // Null for post replies, comment ID for comment replies
+                },
+                {
+                  headers: {
+                    Authorization: `Bearer ${authToken}`,
+                  },
+                }
+              );
+          
+              console.log("Reply created successfully:", response.data);
+            } catch (error) {
+              console.error("Error creating reply:", error.response?.data || error.message);
+            }
+            break;
           }
-          break;
-        }
+          
 
         case "createPost": {
           onClick();
@@ -285,7 +281,7 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
         }
 
         case "submitPost":
-          response = await axios.post("https://localhost:5000/api/writePost", {
+          response = await apiClient.post("https://localhost:5000/api/writePost", {
             postTitle: extraParam.postTitle,
             postText: extraParam.postText,
             userId: userAddress,
@@ -298,7 +294,7 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
         case "deletePost":
         case "confirmDeletePost":
         case "editComment":
-          response = await axios.put("/editItem", {
+          response = await apiClient.put("/editItem", {
             itemId: extraParam.itemId,
             newContent: extraParam.newContent,
             userId: userAddress,
@@ -322,7 +318,33 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
       );
     }
   };
+  const handleSubmitComment = async (e) => {
+    e.preventDefault();
+    const authToken = localStorage.getItem("authToken");
 
+    try {
+      const endpoint = "http://localhost:5000/api/writeComment";
+      const payload = {
+        commentText: formContent,
+        postId: extraParam.postId,
+        userId: userAddress,
+        parentId: type === "replyToComment" ? extraParam.parentId : null,
+      };
+
+      const response = await apiClient.post(endpoint, payload, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      console.log("Comment submitted successfully:", response.data);
+
+      setIsFormVisible(false); // Hide the form
+      setFormContent(""); // Clear the textarea
+    } catch (error) {
+      console.error("Error submitting comment:", error);
+    }
+  };
   const renderButton = () => {
     switch (type) {
       case "upvotePost":
@@ -349,18 +371,7 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
             Downvote Comment
           </Button>
         );
-      case "replyToPost":
-        return (
-          <Button onClick={handleClick} className="button reply">
-            Reply to Post
-          </Button>
-        );
-      case "replyToComment":
-        return (
-          <Button onClick={handleClick} className="button reply">
-            Reply to Comment
-          </Button>
-        );
+        
       case "createPost":
         return (
           <Button onClick={handleClick} className="button create">
@@ -379,6 +390,12 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
             Edit Post
           </Button>
         );
+      case "reply":
+        return (
+          <Button onClick={handleClick} className="button reply">
+            Reply
+          </Button>
+        )
       case "editComment":
         return (
           <Button onClick={handleClick} className="button edit">

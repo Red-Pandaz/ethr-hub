@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import axios from 'axios'
+import apiClient from '../utils/apiClient.jsx'
 export default function CommentActionButton({ extraParam, userAddress, authToken }) {
     const [showForm, setShowForm] = useState(false);
     const [formContent, setFormContent] = useState('');
@@ -8,7 +9,7 @@ export default function CommentActionButton({ extraParam, userAddress, authToken
       e.preventDefault();
       console.log(authToken)
       try {
-        const response = await axios.post(
+        const response = await apiClient.post(
           'http://localhost:5000/api/writeComment',
           {
             commentText: formContent,

@@ -4,9 +4,9 @@ const { retryApiCall } = require('../utils/apiutils.js');
 
 async function getCollection(collectionName){
     try {
-        const db = await retryApiCall(getClient());
+        const db = await getClient()
         const collection = db.collection(collectionName);
-        const documents = await retryApiCall(collection.find({}).toArray())
+        const documents = await collection.find({}).toArray()
         return documents
     } catch (err) {
         console.error(`Error retrieving ${collectionName}`, err);

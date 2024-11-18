@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import apiClient from '../utils/apiClient'
 
 const AuthContext = createContext({
   userAddress: null,
@@ -11,16 +12,16 @@ const AuthContext = createContext({
 
 export const AuthProvider = ({ children }) => {
   const [userAddress, setUserAddress] = useState(null);
-  const [authToken, setAuthToken] = useState(null);  // Manage the token state
+  const [authToken, setAuthToken] = useState(null); 
   const [isConnected, setIsConnected] = useState(false);
   const [loading, setLoading] = useState(true); 
 
   const login = (userAddress, token) => {
     setUserAddress(userAddress);
-    setAuthToken(token);  // Set the token
+    setAuthToken(token);  
     setIsConnected(true);
     localStorage.setItem('authToken', token);
-    localStorage.setItem('userAddress', userAddress);  // Store userAddress as well
+    localStorage.setItem('userAddress', userAddress); 
   };
 
   const logout = () => {
@@ -28,21 +29,28 @@ export const AuthProvider = ({ children }) => {
     setAuthToken(null);  // Clear the token
     setIsConnected(false);
     localStorage.removeItem('authToken');
-    localStorage.removeItem('userAddress');  // Clear userAddress from localStorage
+    localStorage.removeItem('userAddress'); 
   };
 
   useEffect(() => {
     const token = localStorage.getItem('authToken');
     const user = localStorage.getItem('userAddress');
-    if (token && user) {
-      setAuthToken(token);  // Set the authToken from localStorage
-      setUserAddress(user);  // Set the userAddress from localStorage
-      setIsConnected(true);
-    }
-    setLoading(false);
+    const verify = async () => {
+      if (token && user) {
+        const isValid = await verifyTokenWithBackend(token);
+        if (isValid) {
+          setAuthToken(token);
+          setUserAddress(user);
+          setIsConnected(true);
+        } else {
+          logout();
+        }
+      }
+      setLoading(false);
+    };
+    verify();
   }, []);
 
-  // Only render children after loading is complete
   if (loading) return <div>Loading...</div>;
 
   return (
@@ -50,6 +58,16 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
+};
+
+
+const verifyTokenWithBackend = async (token) => {
+  try {
+    const response = await apiClient.post('/verify-token', { token });
+    return response.data.valid;
+  } catch {
+    return false; 
+  }
 };
 
 export const useAuth = () => useContext(AuthContext);

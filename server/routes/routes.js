@@ -207,6 +207,17 @@ router.get('/channels/:channelId', async (req, res) => {
     }
 });
 
+router.get('/channels', async (req, res) => {
+    try {
+        const result = await advData.getChannels()
+        console.log(result)
+        res.status(200).json(result);
+    } catch (err) {
+        console.error('Error getting post:', err);
+        res.status(500).json({ error: 'An error occurred while getting the post.' });
+    }
+});
+
 router.get('/getDataForUserFeed', async (req, res) => {
     try {
         const { userId } = req.query;
@@ -229,6 +240,19 @@ router.get('/getDataForDefaultFeed', async (req, res) => {
     }
 });
 
+router.get('/commentvotes', async (req, res) => {
+    try {
+        const result = await advData.getCommentVotes();
+        if (result) {
+            return res.status(200).json(result); // Send the result back to the client
+        } else {
+            return res.status(404).json({ message: 'Votes not found' });
+        }
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Server error' }); // Handle errors
+    }
+});
 router.post('/login', async (req, res) => {
     const { address, signature, message } = req.body;
 
@@ -247,5 +271,16 @@ router.post('/login', async (req, res) => {
         return res.status(401).json({ error: 'Invalid signature' });
     }
 });
+
+
+router.post('/verify-token', (req, res) => {
+    const { token } = req.body;
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET);
+      res.status(200).json({ valid: true });
+    } catch (err) {
+      res.status(401).json({ valid: false });
+    }
+  });
 
 module.exports = router

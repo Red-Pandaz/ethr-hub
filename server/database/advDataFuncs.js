@@ -19,6 +19,12 @@ async function getDataForPostPage(pid){
             _id: pid
         }
     )
+    results.votes = await dataService.findDocumentsByIndex(
+        'Post Votes',
+        {
+            postId: pid
+        }
+    )
 
     results.comments = await dataService.findDocumentsByIndex(
         'Comments',
@@ -490,11 +496,40 @@ async function getUserByAddress(ethAddress) {
     }
 }
 
+async function getChannels(){
+    try {
+        const channels = await dataService.getCollection('Channels')
+        if (!channels) {
+            return null
+        }
+
+        return channels;
+    } catch (error) {
+        console.error('Error fetching channels:', error);
+        throw error;  
+    }
+}
+
+async function getCommentVotes(){
+    try {
+        const commentVotes = await dataService.getCollection('Comment Votes')
+        if (!commentVotes) {
+            return null
+        }
+
+        return commentVotes
+    } catch (error) {
+        console.error('Error fetching Comment Votes:', error);
+        throw error;  
+    }
+}
+
 
 module.exports = { 
     getDataForPostPage,
     getDataForUserFeed,
     getDataForDefaultFeed,
+    getChannels,
     toggleVote,
     writeComment,
     editComment,
@@ -507,6 +542,7 @@ module.exports = {
     toggleSave,
     checkExistingVote,
     getDataForChannelFeed,
-    getUserByAddress
+    getUserByAddress,
+    getCommentVotes
 }
  
