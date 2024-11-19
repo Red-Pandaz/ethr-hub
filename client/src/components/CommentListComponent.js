@@ -66,7 +66,7 @@ const CommentList = ({ comments, postId }) => {
     fetchVotes();
   }, [comments]);
 
-  const handleReplySubmit = async (text, parentId, postId, ensName) => {
+  const handleCommentReplySubmit = async (text, parentId, postId, ensName) => {
     try {
       const response = await apiClient.post("http://localhost:5000/api/writeComment", 
         {
@@ -94,7 +94,7 @@ const CommentList = ({ comments, postId }) => {
     }
   };
 
-  const handleEditSubmit = async (commentId) => {
+  const handleCommentEditSubmit = async (commentId) => {
     try {
       console.log('edited text ', editedText)
       const response = await apiClient.put(
@@ -122,7 +122,7 @@ const CommentList = ({ comments, postId }) => {
     }
   };
 
-  const handleDelete = async (commentId) => {
+  const handleCommentDelete = async (commentId) => {
     try {
       const response = await apiClient.delete(
         "http://localhost:5000/api/deleteComment", 
@@ -179,7 +179,7 @@ const CommentList = ({ comments, postId }) => {
                   Edit
                 </button>
               )}
-              <button onClick={() => handleDelete(comment._id)}>
+              <button onClick={() => handleCommentDelete(comment._id)}>
                 Delete
               </button>
             </div>
@@ -194,7 +194,7 @@ const CommentList = ({ comments, postId }) => {
                 rows="4"
                 cols="50"
               />
-              <button onClick={() => handleEditSubmit(comment._id)}>Save</button>
+              <button onClick={() => handleCommentEditSubmit(comment._id)}>Save</button>
               <button onClick={() => setIsEditing(null)}>Cancel</button>
             </div>
           )}
@@ -202,7 +202,7 @@ const CommentList = ({ comments, postId }) => {
           {/* Reply Form */}
           {activeComment === comment._id && (
             <CommentForm
-              onSubmit={(text) => handleReplySubmit(text, comment._id, postId, ensName)}
+              onSubmit={(text) => handleCommentReplySubmit(text, comment._id, postId, ensName)}
               onCancel={() => setActiveComment(null)}
             />
           )}

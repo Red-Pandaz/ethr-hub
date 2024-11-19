@@ -66,6 +66,9 @@ async function findDocumentsByIndex(collectionName, params){
 
 async function updateDocumentById(collectionName, documentId, updateData) {
     try {
+        if (!ObjectId.isValid(channelId)) {
+            return res.status(400).json({ error: 'Invalid channel ID format' });
+        }
         const db = await getClient();
         const collection = db.collection(collectionName);
         const result = await collection.findOneAndUpdate(

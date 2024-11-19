@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import apiClient from '../utils/apiClient.jsx';
 
-import ButtonDisplay from '../components/ActionButtons'; // Import the ButtonDisplay component
+import ButtonDisplay from '../components/ActionButtons.js'; // Import the ButtonDisplay component
 
 const ChannelPage = () => {
     const [isFormVisible, setIsFormVisible] = useState(false);

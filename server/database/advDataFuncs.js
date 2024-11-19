@@ -16,7 +16,7 @@ async function getDataForPostPage(pid){
     results.post = await dataService.findOneDocumentByIndex(
         'Posts',
         {
-            _id: pid
+            _id: new ObjectId(pid)
         }
     )
     results.votes = await dataService.findDocumentsByIndex(
@@ -93,8 +93,18 @@ async function getDataForChannelFeed(channelId){
         }
 
     )
-    console.log(posts)
-    return posts
+    const channel = await dataService.findDocumentsByIndex(
+        'Channels',
+        {
+            _id: new ObjectId(channelId)
+        }
+    )
+    console.log('posts ', posts)
+    console.log('channel ', channel)
+    return {
+        posts: posts,
+        channel: channel
+    }
 }
 
 async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction){
@@ -147,7 +157,9 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction){
 
         return
     }
-
+    if (!ObjectId.isValid(channelId)) {
+        return res.status(400).json({ error: 'Invalid ID format' });
+    }
     const vote = await dataService.findOneDocumentByIndex(
         voteType,
         {
