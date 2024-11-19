@@ -14,7 +14,7 @@ apiClient.interceptors.response.use(
       localStorage.removeItem('authToken');
       localStorage.removeItem('userAddress');
 
-      window.location.href = '/login'; // Simple redirect if not using React Router hooks
+      window.location.href = '/login';
     }
     return Promise.reject(error);
   }

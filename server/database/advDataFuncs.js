@@ -355,6 +355,7 @@ async function editComment(newCommentText, cid){
 }
 
 async function deleteComment(cid, uid, pid){
+    console.log(cid, uid, pid)
     await dataService.deleteDocumentById(
         'Comments',
         cid

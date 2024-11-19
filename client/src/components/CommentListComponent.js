@@ -1,22 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { useAuth } from "../context/AuthContext"; // Import useAuth to access the logged-in user's address
-import ButtonDisplay from "./ActionButtons";
-import CommentForm from "./CommentForm"; // A new component for the comment form
+import { useAuth } from "../context/AuthContext";
 import apiClient from '../utils/apiClient';
+import ButtonDisplay from "./ActionButtons";
+import CommentForm from "./CommentForm"; // Assuming you have this for adding/editing comments
 
 const CommentList = ({ comments, postId }) => {
   const [ensName, setEnsName] = useState(null);
-  const { userAddress, authToken } = useAuth(); // Get the logged-in userAddress and authToken from context
-  const [activeComment, setActiveComment] = useState(null); // Tracks which comment is being replied to
-  const [isAddingComment, setIsAddingComment] = useState(false); // Tracks top-level comment form visibility
-  const [votes, setVotes] = useState({}); // State to track votes for each comment
-
-  console.log(userAddress, authToken);
+  const { userAddress, authToken } = useAuth();
+  const [activeComment, setActiveComment] = useState(null);
+  const [isEditing, setIsEditing] = useState(null); // Tracks which comment is being edited
+  const [editedText, setEditedText] = useState(""); // Store edited text
+  const [votes, setVotes] = useState({});
 
   const commentMap = {};
   const nestedComments = [];
 
-  // Organize comments and replies
   comments.forEach((comment) => {
     comment.replies = [];
     commentMap[comment._id] = comment;
@@ -33,96 +31,125 @@ const CommentList = ({ comments, postId }) => {
     }
   });
 
-// Define the handleReplySubmit function here
-const handleReplySubmit = async (text, parentId, postId, ensName) => {
-  try {
-    // Sending the reply to the backend
-    console.log(text)
-    const response = await apiClient.post("http://localhost:5000/api/writeComment", 
-      {
-        commentText: text,       // The text of the reply
-        parentId,   // The parent comment ID
-        postId,     // The post ID
-        ensName,    // ENS name
-        userId: userAddress, // The ID of the user replying
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${authToken}`, // Include the auth token
-        },
-      }
-  );
-
-    // Assuming the backend returns the newly created reply
-    const newReply = response.data;
-
-    // Optionally, update the state to include the new reply (for instant UI update)
-    const updatedComments = [...comments];
-    const parentComment = updatedComments.find(comment => comment._id === parentId);
-    parentComment.replies.push(newReply);
-
-    // Update the UI with the new comment
-    setActiveComment(null); // Close the form
-  } catch (error) {
-    console.error("Error submitting reply:", error);
-    // Optionally handle the error with a message
-  }
-};
-
-
   useEffect(() => {
     const fetchEnsName = async () => {
       try {
         const response = await apiClient.get(`http://localhost:5000/api/ensname/${userAddress}`);
-        setEnsName(response.data.ensName); // Store the ENS name in state
+        setEnsName(response.data.ensName);
       } catch (error) {
         console.error("Error fetching ENS name:", error);
       }
     };
     if (userAddress) {
-      fetchEnsName(); // Fetch ENS name if userAddress is available
+      fetchEnsName();
     }
+
     const fetchVotes = async () => {
-      const voteData = {}; // Object to store votes by commentId
+      const voteData = {};
       try {
-        // Fetch all votes
-        const response = await apiClient.get("http://localhost:5000/api/commentvotes"); // Adjust the URL as needed
+        const response = await apiClient.get("http://localhost:5000/api/commentvotes");
         const allVotes = response.data;
-  
-        // Group votes by commentId
+
         allVotes.forEach(vote => {
           if (!voteData[vote.commentId]) {
             voteData[vote.commentId] = [];
           }
           voteData[vote.commentId].push(vote);
         });
-  
-        setVotes(voteData); // Store grouped votes by commentId
-        console.log('Grouped vote data:', voteData);
+
+        setVotes(voteData);
       } catch (error) {
         console.error('Error fetching votes:', error);
       }
     };
-  
+
     fetchVotes();
-  }, [comments]); // Re-fetch votes if comments change
+  }, [comments]);
+
+  const handleReplySubmit = async (text, parentId, postId, ensName) => {
+    try {
+      const response = await apiClient.post("http://localhost:5000/api/writeComment", 
+        {
+          commentText: text,
+          parentId,
+          postId,
+          ensName,
+          userId: userAddress,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+
+      const newReply = response.data;
+      const updatedComments = [...comments];
+      const parentComment = updatedComments.find(comment => comment._id === parentId);
+      parentComment.replies.push(newReply);
+
+      setActiveComment(null);
+    } catch (error) {
+      console.error("Error submitting reply:", error);
+    }
+  };
+
+  const handleEditSubmit = async (commentId) => {
+    try {
+      const response = await apiClient.put(`http://localhost:5000/api/editComment/${commentId}`, 
+        {
+          text: editedText,
+          userId: userAddress,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+      const updatedComment = response.data;
+      // Update comment in the comments array
+      const updatedComments = comments.map(comment =>
+        comment._id === commentId ? updatedComment : comment
+      );
+      setIsEditing(null);
+      setEditedText("");
+    } catch (error) {
+      console.error("Error editing comment:", error);
+    }
+  };
+
+  const handleDelete = async (commentId) => {
+    try {
+      const response = await apiClient.delete(
+        "http://localhost:5000/api/deleteComment", 
+        {
+          data: {
+            commentId,
+            userId: userAddress,
+            postId
+          },
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+
+      // Remove deleted comment from the state
+      const updatedComments = comments.filter(comment => comment._id !== commentId);
+      setIsEditing(null); // Close the edit form if any
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+    }
+  };
 
   const renderComments = (comments) => {
     return comments.map((comment) => {
-      const isCreator =
-        comment.userId.toLowerCase() === userAddress.toLowerCase(); // Check if the logged-in user is the creator
-  
-      // Get the votes for the current commentId (defaults to an empty array if no votes found)
+      const isCreator = comment.userId.toLowerCase() === userAddress.toLowerCase();
       const commentVotes = votes[comment._id] || [];
-  
-      console.log('Votes for commentId:', comment._id, commentVotes);
-  
-      // Count upvotes and downvotes for this comment
       const upvotes = commentVotes.filter(vote => vote.hasUpvoted).length;
       const downvotes = commentVotes.filter(vote => vote.hasDownvoted).length;
-  
-      console.log('Upvotes:', upvotes, 'Downvotes:', downvotes);
-  
+
       return (
         <div
           key={comment._id}
@@ -140,36 +167,49 @@ const handleReplySubmit = async (text, parentId, postId, ensName) => {
           </span>
           <br />
           <span>{upvotes} Upvotes</span> <span>{downvotes} Downvotes</span>
-          <div>
-            {/* Voting Buttons */}
-            <ButtonDisplay
-              type="upvoteComment"
-              extraParam={{ userId: userAddress, itemId: comment._id, }}
-            />
-            <ButtonDisplay
-              type="downvoteComment"
-              extraParam={{ userId: userAddress, itemId: comment._id, }}
-            />
-  
-            {/* Reply Form */}
-            {activeComment === comment._id && (
-            <CommentForm
-            onSubmit={(text) => {
-              console.log(text)
-              console.log(ensName)
-              handleReplySubmit(text, comment._id, comment.postId, ensName); // Pass relevant data to submit
-            }}
-            onCancel={() => setActiveComment(null)} // Close the form on cancel
-          />
-            )}
-            {/* Reply Button */}
-            {!activeComment && (
-              <button onClick={() => setActiveComment(comment._id)}>
-                Reply
+
+          {/* Edit and Delete Buttons */}
+          {isCreator && (
+            <div>
+              {!isEditing && (
+                <button onClick={() => { setIsEditing(comment._id); setEditedText(comment.text); }}>
+                  Edit
+                </button>
+              )}
+              <button onClick={() => handleDelete(comment._id)}>
+                Delete
               </button>
-            )}
-          </div>
-  
+            </div>
+          )}
+
+          {/* Edit Form */}
+          {isEditing === comment._id && (
+            <div>
+              <textarea
+                value={editedText}
+                onChange={(e) => setEditedText(e.target.value)}
+                rows="4"
+                cols="50"
+              />
+              <button onClick={() => handleEditSubmit(comment._id)}>Save</button>
+              <button onClick={() => setIsEditing(null)}>Cancel</button>
+            </div>
+          )}
+
+          {/* Reply Form */}
+          {activeComment === comment._id && (
+            <CommentForm
+              onSubmit={(text) => handleReplySubmit(text, comment._id, postId, ensName)}
+              onCancel={() => setActiveComment(null)}
+            />
+          )}
+          {/* Reply Button */}
+          {!activeComment && (
+            <button onClick={() => setActiveComment(comment._id)}>
+              Reply
+            </button>
+          )}
+
           {/* Render Nested Replies */}
           {comment.replies.length > 0 && (
             <div>{renderComments(comment.replies)}</div>
@@ -178,25 +218,8 @@ const handleReplySubmit = async (text, parentId, postId, ensName) => {
       );
     });
   };
-  
-  return (
-    <div>
-      {/* Top-Level Comment Form */}
-      {isAddingComment && (
-        <CommentForm
-          onSubmit={(text) => {
-            // Handle top-level comment submission
-            console.log("Adding top-level comment:", { text, parentId: null });
-            setIsAddingComment(false); // Close the form
-          }}
-          onCancel={() => setIsAddingComment(false)} // Close the form on cancel
-        />
-      )}
 
-      {/* Render Comments */}
-      {renderComments(nestedComments)}
-    </div>
-  );
+  return <div>{renderComments(nestedComments)}</div>;
 };
 
 export default CommentList;

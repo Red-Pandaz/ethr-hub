@@ -1,6 +1,7 @@
 const dbName = 'EthrHub'
 const { getClient } = require('./db');
 const { retryApiCall } = require('../utils/apiutils.js');
+const { ObjectId } = require('mongodb');
 
 async function getCollection(collectionName){
     try {
@@ -79,12 +80,16 @@ async function updateDocumentById(collectionName, documentId, updateData) {
     }
 }
 
+
+
 async function deleteDocumentById(collectionName, documentId) {
     try {
+        console.log('Checking collection', collectionName, 'for document', documentId);
+
         const db = await getClient();
         const collection = db.collection(collectionName);
-        
-        const result = await collection.deleteOne({ _id: documentId });
+
+        const result = await collection.deleteOne({ _id: new ObjectId(documentId) });
 
         if (result.deletedCount === 1) {
             console.log("Successfully deleted the document.");
@@ -95,6 +100,7 @@ async function deleteDocumentById(collectionName, documentId) {
         console.error("Error deleting document:", err);
     }
 }
+
 
 async function addToDocumentArray(collectionName, documentId, array, value) {
     try {

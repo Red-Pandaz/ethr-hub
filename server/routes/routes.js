@@ -142,8 +142,10 @@ router.post('/editComment', authenticateJWT, async (req, res) => {
 });
 
 
-router.post('/deleteComment', authenticateJWT, async (req, res) => {
+router.delete('/deleteComment', authenticateJWT, async (req, res) => {
+    console.log('delete request recieved', req.body)
     const { commentId, userId, postId } = req.body;
+    console.log('comment id ', commentId)
     const loggedInUserId = req.userId; 
 
     if (loggedInUserId.toLowerCase() !== userId.toLowerCase()) {
