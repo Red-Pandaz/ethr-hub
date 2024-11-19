@@ -41,13 +41,18 @@ const PostPage = () => {
   if (contextLoading || loading) return <p>Loading...</p>;
 
   if (!data) return <p>No data found</p>;
+  if (data) {
+    console.log(data);
+  }
   if (!isConnected) return <p>Please log in to interact with the post.</p>;
 
   return (
     <div>
       <p>Welcome, your address is: {userAddress}</p>
       <Post data={data} />
-      {data.comments && <CommentList comments={data.comments} />}
+      {data.comments && (
+        <CommentList comments={data.comments} postId={postId} />
+      )}
     </div>
   );
 };

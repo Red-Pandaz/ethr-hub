@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import apiClient from '../utils/apiClient';
+import apiClient from "../utils/apiClient";
 import ButtonDisplay from "./ActionButtons";
 import CommentForm from "./CommentForm"; // Assuming you have this for adding/editing comments
 
 const CommentList = ({ comments, postId }) => {
+  console.log("post id ", postId);
   const [ensName, setEnsName] = useState(null);
   const { userAddress, authToken } = useAuth();
   const [activeComment, setActiveComment] = useState(null);
@@ -34,7 +35,9 @@ const CommentList = ({ comments, postId }) => {
   useEffect(() => {
     const fetchEnsName = async () => {
       try {
-        const response = await apiClient.get(`http://localhost:5000/api/ensname/${userAddress}`);
+        const response = await apiClient.get(
+          `http://localhost:5000/api/ensname/${userAddress}`
+        );
         setEnsName(response.data.ensName);
       } catch (error) {
         console.error("Error fetching ENS name:", error);
@@ -47,10 +50,12 @@ const CommentList = ({ comments, postId }) => {
     const fetchVotes = async () => {
       const voteData = {};
       try {
-        const response = await apiClient.get("http://localhost:5000/api/commentvotes");
+        const response = await apiClient.get(
+          "http://localhost:5000/api/commentvotes"
+        );
         const allVotes = response.data;
 
-        allVotes.forEach(vote => {
+        allVotes.forEach((vote) => {
           if (!voteData[vote.commentId]) {
             voteData[vote.commentId] = [];
           }
@@ -59,7 +64,7 @@ const CommentList = ({ comments, postId }) => {
 
         setVotes(voteData);
       } catch (error) {
-        console.error('Error fetching votes:', error);
+        console.error("Error fetching votes:", error);
       }
     };
 
@@ -68,7 +73,9 @@ const CommentList = ({ comments, postId }) => {
 
   const handleCommentReplySubmit = async (text, parentId, postId, ensName) => {
     try {
-      const response = await apiClient.post("http://localhost:5000/api/writeComment", 
+      console.log("postId: postId");
+      const response = await apiClient.post(
+        "http://localhost:5000/api/writeComment",
         {
           commentText: text,
           parentId,
@@ -85,7 +92,9 @@ const CommentList = ({ comments, postId }) => {
 
       const newReply = response.data;
       const updatedComments = [...comments];
-      const parentComment = updatedComments.find(comment => comment._id === parentId);
+      const parentComment = updatedComments.find(
+        (comment) => comment._id === parentId
+      );
       parentComment.replies.push(newReply);
 
       setActiveComment(null);
@@ -96,7 +105,7 @@ const CommentList = ({ comments, postId }) => {
 
   const handleCommentEditSubmit = async (commentId) => {
     try {
-      console.log('edited text ', editedText)
+      console.log("edited text ", editedText);
       const response = await apiClient.put(
         `http://localhost:5000/api/editComment/`,
         {
@@ -112,7 +121,7 @@ const CommentList = ({ comments, postId }) => {
       );
       const updatedComment = response.data;
       // Update comment in the comments array
-      const updatedComments = comments.map(comment =>
+      const updatedComments = comments.map((comment) =>
         comment._id === commentId ? updatedComment : comment
       );
       setIsEditing(null);
@@ -125,12 +134,12 @@ const CommentList = ({ comments, postId }) => {
   const handleCommentDelete = async (commentId) => {
     try {
       const response = await apiClient.delete(
-        "http://localhost:5000/api/deleteComment", 
+        "http://localhost:5000/api/deleteComment",
         {
           data: {
             commentId,
             userId: userAddress,
-            postId
+            postId,
           },
           headers: {
             Authorization: `Bearer ${authToken}`,
@@ -139,7 +148,9 @@ const CommentList = ({ comments, postId }) => {
       );
 
       // Remove deleted comment from the state
-      const updatedComments = comments.filter(comment => comment._id !== commentId);
+      const updatedComments = comments.filter(
+        (comment) => comment._id !== commentId
+      );
       setIsEditing(null); // Close the edit form if any
     } catch (error) {
       console.error("Error deleting comment:", error);
@@ -148,10 +159,11 @@ const CommentList = ({ comments, postId }) => {
 
   const renderComments = (comments) => {
     return comments.map((comment) => {
-      const isCreator = comment.userId.toLowerCase() === userAddress.toLowerCase();
+      const isCreator =
+        comment.userId.toLowerCase() === userAddress.toLowerCase();
       const commentVotes = votes[comment._id] || [];
-      const upvotes = commentVotes.filter(vote => vote.hasUpvoted).length;
-      const downvotes = commentVotes.filter(vote => vote.hasDownvoted).length;
+      const upvotes = commentVotes.filter((vote) => vote.hasUpvoted).length;
+      const downvotes = commentVotes.filter((vote) => vote.hasDownvoted).length;
 
       return (
         <div
@@ -170,12 +182,24 @@ const CommentList = ({ comments, postId }) => {
           </span>
           <br />
           <span>{upvotes} Upvotes</span> <span>{downvotes} Downvotes</span>
-
+          <ButtonDisplay
+            type={"upvoteComment"}
+            extraParam={{ userId: userAddress, itemId: comment._id }}
+          />
+          <ButtonDisplay
+            type={"downvoteComment"}
+            extraParam={{ userId: userAddress, itemId: comment._id }}
+          />
           {/* Edit and Delete Buttons */}
           {isCreator && (
             <div>
               {!isEditing && (
-                <button onClick={() => { setIsEditing(comment._id); setEditedText(comment.text); }}>
+                <button
+                  onClick={() => {
+                    setIsEditing(comment._id);
+                    setEditedText(comment.text);
+                  }}
+                >
                   Edit
                 </button>
               )}
@@ -184,7 +208,6 @@ const CommentList = ({ comments, postId }) => {
               </button>
             </div>
           )}
-
           {/* Edit Form */}
           {isEditing === comment._id && (
             <div>
@@ -194,25 +217,25 @@ const CommentList = ({ comments, postId }) => {
                 rows="4"
                 cols="50"
               />
-              <button onClick={() => handleCommentEditSubmit(comment._id)}>Save</button>
+              <button onClick={() => handleCommentEditSubmit(comment._id)}>
+                Save
+              </button>
               <button onClick={() => setIsEditing(null)}>Cancel</button>
             </div>
           )}
-
           {/* Reply Form */}
           {activeComment === comment._id && (
             <CommentForm
-              onSubmit={(text) => handleCommentReplySubmit(text, comment._id, postId, ensName)}
+              onSubmit={(text) =>
+                handleCommentReplySubmit(text, comment._id, postId, ensName)
+              }
               onCancel={() => setActiveComment(null)}
             />
           )}
           {/* Reply Button */}
           {!activeComment && (
-            <button onClick={() => setActiveComment(comment._id)}>
-              Reply
-            </button>
+            <button onClick={() => setActiveComment(comment._id)}>Reply</button>
           )}
-
           {/* Render Nested Replies */}
           {comment.replies.length > 0 && (
             <div>{renderComments(comment.replies)}</div>
