@@ -53,14 +53,12 @@ const Login = () => {
         const userAddress = accounts[0];
         const message = "Please sign this message to log in"; // Request message
   
-        // Initialize Web3 provider and signer
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
         
-        // Sign the message
         const signature = await signer.signMessage(message);
   
-        // Send the address and signature to the backend for verification
+
         const response = await fetch('http://localhost:5000/api/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -69,9 +67,8 @@ const Login = () => {
   
         const data = await response.json();
   
-        // Handle backend response (set token and login if successful)
         if (data.token) {
-          login(userAddress, data.token);  // Call the login function from AuthContext
+          login(userAddress, data.token); 
           console.log('Login successful!', data.token);
         } else {
           console.error('Login failed:', data.error || 'Unknown error');
@@ -87,7 +84,7 @@ const Login = () => {
   
 
   const disconnectWallet = () => {
-    logout(); // Call AuthContext's logout
+    logout(); 
   };
 
   return (
@@ -102,6 +99,7 @@ const Login = () => {
           <h3>Welcome!</h3>
           <p>Your address: {userAddress}</p>
           <button onClick={disconnectWallet}>Disconnect</button>
+          <a href="/channels">Browse Channels</a>
         </div>
       )}
     </div>

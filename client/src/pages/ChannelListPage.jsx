@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import apiClient from '../utils/apiClient.jsx';
+import './ChannelListPage.css';
 
 import ButtonDisplay from '../components/ActionButtons.jsx'; // Import the ButtonDisplay component
 
@@ -29,17 +30,21 @@ const ChannelPage = () => {
     if (!data) return <p>No data found</p>;
 
     return (
-        <div>
-            {/* Render the posts */}
-            <ul>
-            {data.map((channel, index) => (
-    <h3 key={index}>
-        <a href={`/channels/${channel._id}`}>{channel.name}</a>
-        <h4>{channel.description}</h4>
-    </h3>
-))}
-            </ul>
+<div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center', padding: '20px' }}>
+    {data.map((channel) => (
+        <div
+            key={channel._id}
+            class='channel-card'
+        >
+            <h3 class='channel-title'>
+                <a href={`/channels/${channel._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                    {channel.name}
+                </a>
+            </h3>
+            <p class='channel-description'>{channel.description}</p>
         </div>
+    ))}
+</div>
     );
 };
 
