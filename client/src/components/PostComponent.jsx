@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import apiClient from '../utils/apiClient.jsx';
 import { useParams } from 'react-router-dom';
-import { useAuth } from "../context/AuthContext";
-import ButtonDisplay from "../components/ActionButtons"; // Adjust the import path as needed
-import CommentForm from "../components/CommentForm"; // Component for the comment form
+import { useAuth } from "../context/AuthContext.jsx";
+import ButtonDisplay from "./ActionButtons.jsx"; // Adjust the import path as needed
+import CommentForm from "./CommentForm.jsx"; // Component for the comment form
 
 const Post = () => {
     const [activeComment, setActiveComment] = useState(null); // Tracks active reply form
