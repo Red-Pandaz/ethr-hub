@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 const CreatePostForm = ({ extraParam, onSubmit }) => {
-  const [postTitle, setPostTitle] = useState('');
-  const [postText, setPostText] = useState('');
+  const [postTitle, setPostTitle] = useState("");
+  const [postText, setPostText] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,22 +17,21 @@ const CreatePostForm = ({ extraParam, onSubmit }) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <input 
-        type="text" 
-        placeholder="Post Title" 
-        value={postTitle} 
-        onChange={(e) => setPostTitle(e.target.value)} 
+      <input
+        type="text"
+        placeholder="Post Title"
+        value={postTitle}
+        onChange={(e) => setPostTitle(e.target.value)}
       />
-      <textarea 
-        placeholder="Post Content" 
-        value={postText} 
-        onChange={(e) => setPostText(e.target.value)} 
+      <textarea
+        placeholder="Post Content"
+        value={postText}
+        onChange={(e) => setPostText(e.target.value)}
       />
       <button type="submit">Submit Post</button>
     </form>
   );
 };
-
 
 const CreatePostButton = () => {
   const [isFormVisible, setIsFormVisible] = useState(false);
@@ -42,14 +41,14 @@ const CreatePostButton = () => {
   };
 
   const handlePostSubmit = (postContent) => {
-    console.log('Post submitted:', postContent);
+    console.log("Post submitted:", postContent);
 
     setIsFormVisible(false);
   };
 
   return (
     <div>
-      <button onClick={handleCreatePostClick} style={{ padding: '10px 20px' }}>
+      <button onClick={handleCreatePostClick} style={{ padding: "10px 20px" }}>
         Create Post
       </button>
 

@@ -1,7 +1,7 @@
 // src/pages/Login.js
-import React, { useEffect } from 'react';
-import { ethers } from 'ethers';
-import { useAuth } from '../context/AuthContext';
+import React, { useEffect } from "react";
+import { ethers } from "ethers";
+import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
   const { userAddress, isConnected, login, logout } = useAuth();
@@ -15,12 +15,12 @@ const Login = () => {
       try {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const accounts = await provider.listAccounts();
-  
+
         if (accounts.length > 0) {
           const userAddress = accounts[0]; // Get the first account address
-          const token = localStorage.getItem('authToken');
-          localStorage.setItem('userAddress', userAddress); // Store userAddress in localStorage
-          
+          const token = localStorage.getItem("authToken");
+          localStorage.setItem("userAddress", userAddress); // Store userAddress in localStorage
+
           if (token) {
             login(userAddress, token); // Set user as authenticated if token exists
           } else {
@@ -31,60 +31,60 @@ const Login = () => {
           console.log("No accounts found, user might not be connected");
         }
       } catch (err) {
-        console.error('Error connecting to MetaMask:', err);
+        console.error("Error connecting to MetaMask:", err);
       }
     } else {
-      alert('Please install MetaMask to use this feature');
+      alert("Please install MetaMask to use this feature");
     }
   };
-  
 
   const connectWallet = async () => {
     // Check if MetaMask is installed
     if (!window.ethereum) {
-      alert('MetaMask is not installed. Please install MetaMask and try again.');
+      alert(
+        "MetaMask is not installed. Please install MetaMask and try again."
+      );
       return;
     }
-  
+
     try {
       // Request user accounts from MetaMask
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
       if (accounts && accounts[0]) {
         const userAddress = accounts[0];
         const message = "Please sign this message to log in"; // Request message
-  
+
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
-        
-        const signature = await signer.signMessage(message);
-  
 
-        const response = await fetch('http://localhost:5000/api/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ address: userAddress, signature, message })
+        const signature = await signer.signMessage(message);
+
+        const response = await fetch("http://localhost:5000/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ address: userAddress, signature, message }),
         });
-  
+
         const data = await response.json();
-  
+
         if (data.token) {
-          login(userAddress, data.token); 
-          console.log('Login successful!', data.token);
+          login(userAddress, data.token);
+          console.log("Login successful!", data.token);
         } else {
-          console.error('Login failed:', data.error || 'Unknown error');
+          console.error("Login failed:", data.error || "Unknown error");
         }
       } else {
-        console.error('No accounts returned from MetaMask');
+        console.error("No accounts returned from MetaMask");
       }
     } catch (err) {
-      console.error('Error connecting to MetaMask:', err);
+      console.error("Error connecting to MetaMask:", err);
     }
   };
-  
-  
 
   const disconnectWallet = () => {
-    logout(); 
+    logout();
   };
 
   return (

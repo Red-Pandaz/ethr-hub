@@ -2,15 +2,15 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import apiClient from "../utils/apiClient";
 import ButtonDisplay from "./ActionButtons";
-import CommentForm from "./CommentForm"; // Assuming you have this for adding/editing comments
+import CommentForm from "./CommentForm";
 
 const CommentList = ({ comments, postId }) => {
   console.log("post id ", postId);
   const [ensName, setEnsName] = useState(null);
   const { userAddress, authToken } = useAuth();
   const [activeComment, setActiveComment] = useState(null);
-  const [isEditing, setIsEditing] = useState(null); // Tracks which comment is being edited
-  const [editedText, setEditedText] = useState(""); // Store edited text
+  const [isEditing, setIsEditing] = useState(null); 
+  const [editedText, setEditedText] = useState(""); 
   const [votes, setVotes] = useState({});
 
   const commentMap = {};

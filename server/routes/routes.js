@@ -64,7 +64,7 @@ router.post('/writePost', authenticateJWT, async (req, res) => {
     }
 });
 
-router.post('/editPost', authenticateJWT, async (req, res) => {
+router.put('/editPost', authenticateJWT, async (req, res) => {
     const { newPostText, postId, userId } = req.body;
     const loggedInUserId = req.userId; // Extract authenticated user
 
@@ -82,7 +82,7 @@ router.post('/editPost', authenticateJWT, async (req, res) => {
 });
 
 
-router.post('/deletePost', authenticateJWT, async (req, res) => {
+router.delete('/deletePost', authenticateJWT, async (req, res) => {
     const { channelId, userId, postId } = req.body;
     const loggedInUserId = req.userId; // Extract authenticated user
 
