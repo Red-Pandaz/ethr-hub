@@ -48,7 +48,7 @@ router.post('/toggleVote', authenticateJWT, async (req, res) => {
 });
 
 router.post('/writePost', authenticateJWT, async (req, res) => {
-    const { postText, postTitle, userId, channelId } = req.body;
+    const { postText, postTitle, ensName, userId, channelId } = req.body;
     const loggedInUserId = req.userId; // Extract authenticated user
 
     if (loggedInUserId.toLowerCase() !== userId.toLowerCase()) {
@@ -56,7 +56,7 @@ router.post('/writePost', authenticateJWT, async (req, res) => {
     }
 
     try {
-        const result = await advData.writePost(postText, postTitle, loggedInUserId, channelId);
+        const result = await advData.writePost(postText, postTitle, ensName, loggedInUserId, channelId);
         res.status(200).json(result);
     } catch (err) {
         console.error('Error writing post:', err);

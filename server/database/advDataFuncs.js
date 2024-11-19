@@ -69,7 +69,6 @@ async function getDataForUserFeed(uid){
     userFeed.push(postIds)
     }
 
-console.log(userFeed)
 return userFeed
 }
 
@@ -81,7 +80,6 @@ async function getDataForDefaultFeed(){
         }
 
     )
-    console.log(posts)
     return posts
 }
 
@@ -137,7 +135,6 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction){
         const newVote = await dataService.createDocument(voteType, newVoteObj);
         const newVoteId = newVote.insertedId.toString();
         if(newVoteObj.hasUpvoted){
-            console.log('upvote')
             const newUpvote = await dataService.addToDocumentArray(itemType, itemId, 'votes.upvotes', newVoteId)
             console.log(newUpvote)
             if(itemType === 'Posts'){
@@ -146,7 +143,6 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction){
                 await dataService.addToDocumentArray('Users', uid, 'votes.comments.upvotes', newVoteId)
             }
         } else if (newVoteObj.hasDownvoted){
-            console.log('downvote')
            const newDownvote= await dataService.addToDocumentArray(itemType, itemId, 'votes.downvotes', newVoteId)
             if(itemType === 'Posts'){
                 await dataService.addToDocumentArray('Users', uid, 'votes.posts.downvotes', newVoteId)
@@ -168,8 +164,6 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction){
     )
     
     const { hasUpvoted, hasDownvoted } = vote
-    console.log(hasUpvoted)
-    console.log(hasDownvoted)
     if(!hasDownvoted){
     }
 
@@ -376,7 +370,7 @@ async function deleteComment(cid, uid, pid){
     await dataService.removeFromDocumentArray('Posts', pid, 'comments', cid)
 }
 
-async function writePost(postText, postTitle, uid, cid, ensName){
+async function writePost(postText, postTitle, ensName, uid, cid){
     const newPostObj = 
     {
         channel: cid,
@@ -393,12 +387,13 @@ async function writePost(postText, postTitle, uid, cid, ensName){
         createdAt: new Date(),
         modifiedAt: new Date(),
       }
+      console.log(newPostObj)
     const newPost = await dataService.createDocument(
         'Posts',
         newPostObj
     )
-    await dataService.addToDocumentArray('Channels', cid, posts, newPost._id)
-    await dataService.addToDocumentArray('Users', uid, posts, newPost._id)
+    // await dataService.addToDocumentArray('Channels', cid, posts, newPost._id)
+    // await dataService.addToDocumentArray('Users', uid, posts, newPost._id)
 }
 
 

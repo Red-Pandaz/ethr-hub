@@ -6,41 +6,37 @@ import apiClient from '../utils/apiClient';
 
 const ChannelPage = () => {
     const [isFormVisible, setIsFormVisible] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [posts, setPosts] = useState([]);
     const [channel, setChannel] = useState('');
     const [postTitle, setPostTitle] = useState('');
     const [postText, setPostText] = useState('');
+    const [ensName, setEnsName] = useState(null);
+    const [loading, setLoading] = useState(true);
+
     const { channelId } = useParams();
     const { userAddress, authToken } = useAuth();
-    const [loading, setLoading] = useState(true);
-    const navigate = useNavigate(); // Initialize navigate hook
+    const navigate = useNavigate();
 
     useEffect(() => {
-                // Validate the channelId format using regex
-                const isValidObjectId = (id) => /^[a-fA-F0-9]{24}$/.test(id);
-        
-                if (!isValidObjectId(channelId)) {
-                    // If channelId is invalid, redirect to error page
-                    navigate('/error', { replace: true });
-                    return;
-                }
-        // Fetch posts for the channel
         const fetchPosts = async () => {
-            
             try {
-                
-                const response = await apiClient.get(`http://localhost:5000/api/channels/${channelId}`);
-                console.log(response.data.channel)
-                if (!response.data.channel || response.data.channel.length === 0) {
-                    // If channel is empty, redirect to the error page
+                if (!/^[a-fA-F0-9]{24}$/.test(channelId)) {
                     navigate('/error', { replace: true });
                     return;
                 }
+
+                const response = await apiClient.get(`http://localhost:5000/api/channels/${channelId}`);
+                if (!response.data.channel || response.data.channel.length === 0) {
+                    navigate('/error', { replace: true });
+                    return;
+                }
+
                 setPosts(response.data.posts);
-                setChannel(response.data.channel[0])
-                setLoading(false);
+                setChannel(response.data.channel[0]);
             } catch (error) {
                 console.error('Error fetching posts:', error);
+            } finally {
                 setLoading(false);
             }
         };
@@ -48,34 +44,48 @@ const ChannelPage = () => {
         fetchPosts();
     }, [channelId]);
 
+    useEffect(() => {
+        const fetchEnsName = async () => {
+            try {
+                const response = await apiClient.get(`http://localhost:5000/api/ensname/${userAddress}`);
+               
+                setEnsName(response.data.ensName);
+                console.log("ENS Name fetched:", ensName); // Log fetched value
+            } catch (error) {
+                console.error("Error fetching ENS name:", error);
+            }
+        };
+
+        if (userAddress) fetchEnsName();
+    }, [userAddress]);
+
+    useEffect(() => {
+        console.log("ENS Name updated in state:", ensName);
+    }, [ensName]); // Runs whenever ensName changes
+
     const handlePostSubmit = async (e) => {
         e.preventDefault();
-        try {
-            const newPost = {
-                postTitle,
-                postText,
-                userId: userAddress,
-                channelId,
-            };
+        setIsSubmitting(true);
 
+        try {
+            const newPost = { postTitle, postText, ensName, userId: userAddress, channelId };
+            console.log(newPost)
             const response = await apiClient.post('http://localhost:5000/api/writePost', newPost, {
-                headers: {
-                    Authorization: `Bearer ${authToken}`,
-                },
+                headers: { Authorization: `Bearer ${authToken}` },
             });
 
-            // Add the new post to the posts list and reset the form
             setPosts([response.data, ...posts]);
             setPostTitle('');
             setPostText('');
             setIsFormVisible(false);
         } catch (error) {
             console.error('Error submitting post:', error);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
     if (loading) return <p>Loading...</p>;
-
 
     return (
         <div>
@@ -108,7 +118,9 @@ const ChannelPage = () => {
                             ></textarea>
                         </label>
                     </div>
-                    <button type="submit">Submit Post</button>
+                    <button type="submit" disabled={isSubmitting}>
+                        {isSubmitting ? 'Submitting...' : 'Submit Post'}
+                    </button>
                 </form>
             )}
 
@@ -116,9 +128,9 @@ const ChannelPage = () => {
                 {posts.map((post) => (
                     <li key={post._id}>
                         <h3>
-                            <a href={`/posts/${post._id}`}>{post.title}</a>
+                            <a href={`/posts/${post._id}`}>{post.title || 'Untitled Post'}</a>
                         </h3>
-                        <p>{post.content}</p>
+                        <p>{post.content || 'No content available.'}</p>
                     </li>
                 ))}
             </ul>
