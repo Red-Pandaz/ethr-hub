@@ -104,6 +104,7 @@ const ChannelPage = () => {
   return (
     <div>
       <h1>Channel: {channel.name}</h1>
+      <p>You are signed in as {localStorage.getItem("ensName") || userAddress}</p>
       <button onClick={() => setIsFormVisible(!isFormVisible)}>
         {isFormVisible ? "Cancel" : "Create Post"}
       </button>

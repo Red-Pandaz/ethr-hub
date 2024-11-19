@@ -2,11 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import apiClient from "../utils/apiClient.jsx";
 import "./ChannelListPage.css";
+import { useAuth } from "../context/AuthContext";
 
 import ButtonDisplay from "../components/ActionButtons.jsx"; // Import the ButtonDisplay component
 
 const ChannelPage = () => {
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const { userAddress, authToken } = useAuth();
   const { channelId } = useParams();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -31,7 +33,9 @@ const ChannelPage = () => {
   if (!data) return <p>No data found</p>;
 
   return (
-    <div
+    <> 
+           <p>You are signed in as {localStorage.getItem("ensName") || userAddress}</p> 
+           <div
       style={{
         display: "flex",
         flexWrap: "wrap",
@@ -40,6 +44,7 @@ const ChannelPage = () => {
         padding: "20px",
       }}
     >
+
       {data.map((channel) => (
         <div key={channel._id} class="channel-card">
           <h3 class="channel-title">
@@ -54,6 +59,8 @@ const ChannelPage = () => {
         </div>
       ))}
     </div>
+    </>
+
   );
 };
 

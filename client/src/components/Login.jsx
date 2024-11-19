@@ -1,4 +1,3 @@
-// src/pages/Login.js
 import React, { useEffect } from "react";
 import { ethers } from "ethers";
 import { useAuth } from "../context/AuthContext";
@@ -17,14 +16,13 @@ const Login = () => {
         const accounts = await provider.listAccounts();
 
         if (accounts.length > 0) {
-          const userAddress = accounts[0]; // Get the first account address
+          const userAddress = accounts[0];
           const token = localStorage.getItem("authToken");
-          localStorage.setItem("userAddress", userAddress); // Store userAddress in localStorage
+          localStorage.setItem("userAddress", userAddress);
 
           if (token) {
-            login(userAddress, token); // Set user as authenticated if token exists
+            login(userAddress, token); 
           } else {
-            // Optionally handle the case where there is no token (e.g., prompt user to log in)
             console.log("No token found, user might not be logged in");
           }
         } else {
@@ -39,7 +37,6 @@ const Login = () => {
   };
 
   const connectWallet = async () => {
-    // Check if MetaMask is installed
     if (!window.ethereum) {
       alert(
         "MetaMask is not installed. Please install MetaMask and try again."
@@ -70,7 +67,12 @@ const Login = () => {
         const data = await response.json();
 
         if (data.token) {
-          login(userAddress, data.token);
+          // Store token and ensName in localStorage
+          localStorage.setItem("authToken", data.token);
+          localStorage.setItem("ensName", data.ensName); // Store ensName
+          
+          // Call login from context
+          login(userAddress, data.token, data.ensName); // Pass ensName to context
           console.log("Login successful!", data.token);
         } else {
           console.error("Login failed:", data.error || "Unknown error");
@@ -97,7 +99,8 @@ const Login = () => {
       ) : (
         <div>
           <h3>Welcome!</h3>
-          <p>Your address: {userAddress}</p>
+          <p>You are signed in as {localStorage.getItem("ensName") || userAddress}</p>
+    
           <button onClick={disconnectWallet}>Disconnect</button>
           <a href="/channels">Browse Channels</a>
         </div>

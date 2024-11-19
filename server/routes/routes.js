@@ -256,18 +256,22 @@ router.get('/commentvotes', async (req, res) => {
 });
 router.post('/login', async (req, res) => {
     const { address, signature, message } = req.body;
+    let ensName;
 
     if (verifySignature(message, signature, address)) {
         // Check if user exists in the database
         const existingUser = await advData.getUserByAddress(address);
-        
+
         // If user doesn't exist, create a new user
         if (!existingUser) {
-            await advData.createUser(address);
+            ensName = await advData.createUser(address);
+        } else {
+            ensName = existingUser.ensName;  // Correct typo from existerUser to existingUser
         }
 
         const token = jwt.sign({ userId: address }, JWT_SECRET, { expiresIn: '1h' });
-        return res.json({ token });
+        
+        return res.json({ token, ensName });
     } else {
         return res.status(401).json({ error: 'Invalid signature' });
     }

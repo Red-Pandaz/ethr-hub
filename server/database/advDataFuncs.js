@@ -545,7 +545,7 @@ async function createUser(ethAddress) {
     };
 
     const newUser = await dataService.createDocument("Users", newUserObj);
-    return newUser;
+    return ensName;
   }
 }
 async function getUserByAddress(ethAddress) {

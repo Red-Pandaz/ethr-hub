@@ -48,7 +48,7 @@ const PostPage = () => {
 
   return (
     <div>
-      <p>Welcome, your address is: {userAddress}</p>
+      <p>Welcome, you are signed in as {localStorage.getItem("ensName") || userAddress}</p>
       <Post data={data} />
       {data.comments && (
         <CommentList comments={data.comments} postId={postId} />
