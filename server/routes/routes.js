@@ -124,7 +124,7 @@ router.post('/writeComment', authenticateJWT, async (req, res) => {
     }
 });
 
-router.post('/editComment', authenticateJWT, async (req, res) => {
+router.put('/editComment', authenticateJWT, async (req, res) => {
     const { newCommentText, commentId, userId } = req.body;
     const loggedInUserId = req.userId; 
 
@@ -140,7 +140,6 @@ router.post('/editComment', authenticateJWT, async (req, res) => {
         res.status(500).json({ error: 'An error occurred while editing the comment.' });
     }
 });
-
 
 router.delete('/deleteComment', authenticateJWT, async (req, res) => {
     console.log('delete request recieved', req.body)

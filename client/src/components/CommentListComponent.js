@@ -96,9 +96,12 @@ const CommentList = ({ comments, postId }) => {
 
   const handleEditSubmit = async (commentId) => {
     try {
-      const response = await apiClient.put(`http://localhost:5000/api/editComment/${commentId}`, 
+      console.log('edited text ', editedText)
+      const response = await apiClient.put(
+        `http://localhost:5000/api/editComment/`,
         {
-          text: editedText,
+          commentId,
+          newCommentText: editedText,
           userId: userAddress,
         },
         {

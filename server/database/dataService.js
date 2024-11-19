@@ -69,7 +69,7 @@ async function updateDocumentById(collectionName, documentId, updateData) {
         const db = await getClient();
         const collection = db.collection(collectionName);
         const result = await collection.findOneAndUpdate(
-            { _id: documentId },
+            { _id: new ObjectId(documentId) },
             { $set: updateData },
             { returnOriginal: false }
         );
