@@ -49,6 +49,7 @@ const Post = () => {
       });
   }, [postId, userAddress]);
 
+ 
   const handleEditSubmit = async () => {
     try {
       const response = await apiClient.put(
@@ -112,7 +113,9 @@ const handleDelete = async () => {
       setData((prevData) => ({
         ...prevData,
         comments: [...prevData.comments, newComment],
+        
       }));
+      window.location.reload()
     } catch (error) {
       console.error("Error submitting reply:", error);
     }
@@ -123,12 +126,9 @@ const handleDelete = async () => {
 
   return (
     <div>
-      <h1>Post Details</h1>
-
-      {/* Post content */}
       <div key={postId}>
-        <h4>{data.post.title}</h4>
-        <span>Created By {data.post.ensName || data.post.createdBy}</span>
+        <h2>{data.post.title}</h2>
+        <span><strong>Created by {data.post.ensName || data.post.createdBy}</strong></span>
         <p>
           {isEditing ? (
             <textarea

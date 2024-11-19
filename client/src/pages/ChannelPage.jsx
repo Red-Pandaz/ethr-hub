@@ -103,8 +103,9 @@ const ChannelPage = () => {
 
   return (
     <div>
-      <h1>Channel: {channel.name}</h1>
-      <p>You are signed in as {localStorage.getItem("ensName") || userAddress}</p>
+<p>You are signed in as {localStorage.getItem("ensName") == "null" ? userAddress: localStorage.getItem("ensName")}</p>
+      <h1>{channel.name}</h1>
+  
       <button onClick={() => setIsFormVisible(!isFormVisible)}>
         {isFormVisible ? "Cancel" : "Create Post"}
       </button>
@@ -145,7 +146,7 @@ const ChannelPage = () => {
             <h3>
               <a href={`/posts/${post._id}`}>{post.title || "Untitled Post"}</a>
             </h3>
-            <p>{post.content || "No content available."}</p>
+            <p>by { post.ensName || post.createdBy || "No content available."}</p>
           </li>
         ))}
       </ul>

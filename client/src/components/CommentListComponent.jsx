@@ -98,6 +98,7 @@ const CommentList = ({ comments, postId }) => {
       parentComment.replies.push(newReply);
 
       setActiveComment(null);
+      window.location.reload()
     } catch (error) {
       console.error("Error submitting reply:", error);
     }
@@ -126,6 +127,7 @@ const CommentList = ({ comments, postId }) => {
       );
       setIsEditing(null);
       setEditedText("");
+      window.location.reload()
     } catch (error) {
       console.error("Error editing comment:", error);
     }

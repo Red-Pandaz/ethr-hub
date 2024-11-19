@@ -90,6 +90,7 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction) {
     itemType,
     userAction,
   });
+  let result;
 
   if (!voteId) {
     const newVoteObj = {};
@@ -159,17 +160,17 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction) {
       }
     }
 
-    return;
+    result = { success: true, message: "Vote created successfully" };
+    return result;
   }
+
   const vote = await dataService.findOneDocumentByIndex(voteType, {
     _id: new ObjectId(voteId),
   });
 
   const { hasUpvoted, hasDownvoted } = vote;
-  if (!hasDownvoted) {
-  }
 
-  if (!hasUpvoted && !hasDownvoted) {
+  if (!hasDownvoted && !hasUpvoted) {
     if (userAction === "Upvote") {
       await dataService.updateDocumentById(voteType, new ObjectId(voteId), {
         hasUpvoted: true,
@@ -195,8 +196,7 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction) {
           voteId
         );
       }
-
-      //logic for turning neutral to upvote
+      result = { success: true, message: "Upvoted successfully" };
     } else if (userAction === "Downvote") {
       await dataService.updateDocumentById(voteType, new ObjectId(voteId), {
         hasDownvoted: true,
@@ -222,6 +222,7 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction) {
           voteId
         );
       }
+      result = { success: true, message: "Downvoted successfully" };
     }
   } else if (hasUpvoted && !hasDownvoted) {
     if (userAction === "Upvote") {
@@ -254,6 +255,7 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction) {
           voteId
         );
       }
+      result = { success: true, message: "Removed upvote successfully" };
     } else if (userAction === "Downvote") {
       await dataService.updateDocumentById(voteType, new ObjectId(voteId), {
         hasUpvoted: false,
@@ -263,13 +265,13 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction) {
         itemType,
         itemId,
         "votes.downvotes",
-        uid
+        voteId
       );
       await dataService.removeFromDocumentArray(
         itemType,
         itemId,
         "votes.upvotes",
-        uid
+        voteId
       );
       if (itemType === "Posts") {
         await dataService.addToDocumentArray(
@@ -298,6 +300,7 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction) {
           voteId
         );
       }
+      result = { success: true, message: "Downvoted successfully" };
     }
   } else if (!hasUpvoted && hasDownvoted) {
     if (userAction === "Upvote") {
@@ -344,12 +347,11 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction) {
           voteId
         );
       }
-      //logic for turning downvote to upvote
+      result = { success: true, message: "Upvoted successfully" };
     } else if (userAction === "Downvote") {
       await dataService.updateDocumentById(voteType, new ObjectId(voteId), {
         hasDownvoted: false,
       });
-
       await dataService.removeFromDocumentArray(
         itemType,
         itemId,
@@ -371,9 +373,13 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction) {
           voteId
         );
       }
+      result = { success: true, message: "Removed downvote successfully" };
     }
   }
+
+  return result;
 }
+
 
 async function toggleSave(uid, itemId, itemType) {
   try {

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import Button from "./Button"; // Import the Button component
-import axios from "axios"; // Import axios for making API calls
 import { useAuth } from "../context/AuthContext";
 import apiClient from '../utils/apiClient'
 
@@ -60,14 +59,14 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
                   },
                 }
               );
-
+              console.log('62')
               const existingVote = doesVoteExist.data;
               console.log("Existing vote:", existingVote);
 
               let vid = existingVote ? existingVote._id : null;
 
               // Toggle the vote
-              const response = await apiClient.post(
+              response = await apiClient.post(
                 "http://localhost:5000/api/toggleVote",
                 {
                   voteId: vid,
@@ -83,12 +82,14 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
                   },
                 }
               );
-
+              console.log('85', response)
               console.log("Vote toggled successfully:", response.data);
+              console.log('87')
             } catch (error) {
               console.error("Error toggling vote:", error.message);
             }
           }
+          window.location.reload()
           break;
 
         case "downvotePost":
@@ -131,14 +132,14 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
                   },
                 }
               );
-
+console.log('133')
               const existingVote = doesVoteExist.data;
               console.log("Existing vote:", existingVote);
 
               let vid = existingVote ? existingVote._id : null;
 
               // Toggle the vote
-              const response = await apiClient.post(
+              response = await apiClient.post(
                 "http://localhost:5000/api/toggleVote",
                 {
                   voteId: vid,
@@ -154,12 +155,13 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
                   },
                 }
               );
-
+              console.log('156')
               console.log("Vote toggled successfully:", response.data);
             } catch (error) {
               console.error("Error toggling vote:", error.message);
             }
           }
+          window.location.reload()
           break;
 
         case "upvoteComment":
@@ -172,6 +174,7 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
                 },
               }
             );
+            console.log('174')
             const existingVote = doesVoteExist.data;
             console.log(JSON.stringify(doesVoteExist, null, 2));
             let vid;
@@ -198,6 +201,7 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
               }
             );
           }
+          window.location.reload()
           break;
 
         case "downvoteComment":
@@ -210,6 +214,7 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
                 },
               }
             );
+            console.log('213')
             const existingVote = doesVoteExist.data;
             console.log(JSON.stringify(doesVoteExist, null, 2));
             let vid;
@@ -219,7 +224,7 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
               vid = null;
             }
 
-            response = await apiClient.post(
+            const response = await apiClient.post(
               "http://localhost:5000/api/toggleVote",
               {
                 voteId: vid,
@@ -236,6 +241,7 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
               }
             );
           }
+          window.location.reload()
           break;
 
           case "reply": {
@@ -263,7 +269,7 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
               };
           
               // Send the API request to create the comment
-              const response = await apiClient.post(
+              response = await apiClient.post(
                 "http://localhost:5000/api/writeComment", 
                 requestData,
                 {
@@ -274,6 +280,7 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
               );
           
               // Handle successful response
+              console.log('278')
               console.log("Reply created successfully:", response.data);
             } catch (error) {
               // Handle errors more specifically
@@ -322,7 +329,10 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
       }
 
       if (onClick) {
+        console.log('328')
+        console.log('resp: ', response)
         onClick(response.data); // Pass the response data to the onClick handler
+        console.log('330')
       }
     } catch (error) {
       console.error(

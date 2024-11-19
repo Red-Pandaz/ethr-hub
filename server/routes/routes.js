@@ -40,6 +40,7 @@ router.post('/toggleVote', authenticateJWT, async (req, res) => {
 
     try {
         const result = await advData.toggleVote(voteId, userId, itemId, voteType, itemType, userAction);
+        console.log('result ', result)
         res.status(200).json(result);
     } catch (err) {
         console.error('Error toggling vote:', err);
@@ -160,7 +161,7 @@ router.delete('/deleteComment', authenticateJWT, async (req, res) => {
     }
 });
 
-router.post('/createChannel', async (req, res) => {
+router.post('createChannel', async (req, res) => {
     try {
         const { channelName, channelDescription, userId } = req.body;
         const result = await advData.createChannel(channelName, channelDescription, userId)
@@ -270,7 +271,7 @@ router.post('/login', async (req, res) => {
         }
 
         const token = jwt.sign({ userId: address }, JWT_SECRET, { expiresIn: '1h' });
-        
+
         return res.json({ token, ensName });
     } else {
         return res.status(401).json({ error: 'Invalid signature' });

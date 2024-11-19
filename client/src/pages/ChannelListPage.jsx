@@ -34,7 +34,7 @@ const ChannelPage = () => {
 
   return (
     <> 
-           <p>You are signed in as {localStorage.getItem("ensName") || userAddress}</p> 
+<p>You are signed in as {localStorage.getItem("ensName") == "null" ? userAddress: localStorage.getItem("ensName")}</p>
            <div
       style={{
         display: "flex",
