@@ -1,3 +1,5 @@
+// basic functions defining MongoDB CRUD events
+
 const dbName = "EthrHub";
 const { getClient } = require("./db");
 const { retryApiCall } = require("../utils/apiutils.js");

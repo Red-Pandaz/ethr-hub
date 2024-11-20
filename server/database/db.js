@@ -1,4 +1,5 @@
-// db.js
+// Database connection logic
+
 const { MongoClient } = require("mongodb");
 const { retryApiCall, accessSecret } = require("../utils/apiutils.js");
 

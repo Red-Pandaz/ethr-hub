@@ -1,7 +1,10 @@
+// CRUD functions to use on an application scale
+
 const dataService = require("./dataService.js");
 const { ObjectId } = require("mongodb");
 const { checkEnsName } = require("../utils/apiutils.js");
 
+// Function to check if vote object exists
 async function checkExistingVote(voteType, idType, uid, itemId) {
   console.log("Checking existing vote with:", {
     voteType,
@@ -16,6 +19,8 @@ async function checkExistingVote(voteType, idType, uid, itemId) {
   console.log("Found existing vote:", results);
   return results;
 }
+
+// Getting all data for post page. This includes the post itself, post votes, comments and comment votes
 async function getDataForPostPage(pid) {
   const results = {};
   results.post = await dataService.findOneDocumentByIndex("Posts", {
@@ -42,6 +47,8 @@ async function getDataForPostPage(pid) {
   return results;
 }
 
+// This function is not being used. The full vision of the project included allowing users to subscribe to channels
+// This would be used to retrieve data for a user's feed
 async function getDataForUserFeed(uid) {
   const user = await dataService.findOneDocumentByIndex("Users", {
     _id: uid,
@@ -59,13 +66,14 @@ async function getDataForUserFeed(uid) {
   return userFeed;
 }
 
+// There was also going to be a default feed for unauthenticated/new users
 async function getDataForDefaultFeed() {
   const posts = await dataService.findDocumentsByIndex("Posts", {
     channel: "channelId1",
   });
   return posts;
 }
-
+// Retrieves all posts associated with a channelId
 async function getDataForChannelFeed(channelId) {
   const posts = await dataService.findDocumentsByIndex("Posts", {
     channel: channelId,
@@ -80,6 +88,13 @@ async function getDataForChannelFeed(channelId) {
     channel: channel,
   };
 }
+
+// This is a very complicated function that handles the voting logic for both posts and comments
+// When a user tries to vote, the function first checks for an existing match.
+// Each userId/postId and userId/commentId combinations can only have one vote object
+// If none is found a new one is created
+// If one is found it is toggled based on its current state and the user action
+// The vote has 2 boolean values- hasUpvoted and hasDownvoted. These can both be false, or one of them can be true, but both of them cannot be true.
 
 async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction) {
   console.log("Toggle Vote Params:", {
@@ -380,7 +395,7 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction) {
   return result;
 }
 
-
+// Function for another unused feature that would have allowed users to save favorite posts
 async function toggleSave(uid, itemId, itemType) {
   try {
     const user = await dataService.findOneDocumentByIndex("Users", {
@@ -415,6 +430,7 @@ async function toggleSave(uid, itemId, itemType) {
   }
 }
 
+// Function for creating a new comment
 async function writeComment(commentText, uid, pid, replyToId, ensName) {
   const commentObj = {
     postId: pid,
@@ -435,6 +451,7 @@ async function writeComment(commentText, uid, pid, replyToId, ensName) {
   await dataService.addToDocumentArray("Posts", pid, "comments", newCommentId);
 }
 
+// Function for editing a comment
 async function editComment(newCommentText, cid) {
   await dataService.updateDocumentById("Comments", cid, {
     modifiedAt: new Date(),
@@ -442,6 +459,7 @@ async function editComment(newCommentText, cid) {
   });
 }
 
+// Function for deleting a comment
 async function deleteComment(cid, uid, pid) {
   console.log(cid, uid, pid);
   await dataService.deleteDocumentById("Comments", cid);
@@ -449,6 +467,7 @@ async function deleteComment(cid, uid, pid) {
   await dataService.removeFromDocumentArray("Posts", pid, "comments", cid);
 }
 
+// Function for creating a new post
 async function writePost(postText, postTitle, ensName, uid, cid) {
   const newPostObj = {
     channel: cid,
@@ -478,7 +497,7 @@ async function editPost(newPostText, pid) {
   });
 }
 
-//MAKE SURE TO ADD LOGIC FOR DELETING POSTID FROM USER AND CHANNEL
+// Function for deleting a post
 async function deletePost(cid, uid, pid) {
   const deletedPost = await dataService.deleteDocumentById("Posts", pid);
   await dataService.addToDocumentArray("Users", uid, "posts", pid);
@@ -486,6 +505,7 @@ async function deletePost(cid, uid, pid) {
   return deletedPost;
 }
 
+// Function for creating a channel (unused)
 async function createChannel(channelName, channelDescription, uid) {
   const channelCheck = await dataService.findOneDocumentByIndex("Channels", {
     name: channelName,
@@ -518,6 +538,8 @@ async function createChannel(channelName, channelDescription, uid) {
   }
 }
 
+// Function for creating a new user
+// This function also checks ENS to see if an address has a name
 async function createUser(ethAddress) {
   const userCheck = await dataService.findOneDocumentByIndex("Users", {
     _id: ethAddress,
@@ -554,6 +576,8 @@ async function createUser(ethAddress) {
     return ensName;
   }
 }
+
+// Function for retrieiving a user document
 async function getUserByAddress(ethAddress) {
   try {
     const user = await dataService.findOneDocumentByIndex("Users", {
@@ -571,6 +595,7 @@ async function getUserByAddress(ethAddress) {
   }
 }
 
+// Function for retrieving all channels
 async function getChannels() {
   try {
     const channels = await dataService.getCollection("Channels");
@@ -585,6 +610,7 @@ async function getChannels() {
   }
 }
 
+// Function for retrieiving all comment votes
 async function getCommentVotes() {
   try {
     const commentVotes = await dataService.getCollection("Comment Votes");
@@ -595,6 +621,21 @@ async function getCommentVotes() {
     return commentVotes;
   } catch (error) {
     console.error("Error fetching Comment Votes:", error);
+    throw error;
+  }
+}
+
+// Function for retrieiving all post votes
+async function getPostVotes() {
+  try {
+    const postVotes = await dataService.getCollection("Post Votes");
+    if (!postVotes) {
+      return null;
+    }
+
+    return postVotes;
+  } catch (error) {
+    console.error("Error fetching Post Votes:", error);
     throw error;
   }
 }
@@ -618,4 +659,5 @@ module.exports = {
   getDataForChannelFeed,
   getUserByAddress,
   getCommentVotes,
+  getPostVotes,
 };

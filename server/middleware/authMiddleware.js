@@ -1,8 +1,9 @@
 const jwt = require("jsonwebtoken");
 const { retryApiCall, accessSecret } = require("../utils/apiutils.js");
 
+// Retrieves Secret Key from Google Cloud and verifies authenticity of user token
 const authenticateJWT = async (req, res, next) => {
-  const JWT_SECRET =  await retryApiCall(() => accessSecret("JWT_SECRET"));
+  const JWT_SECRET = await retryApiCall(() => accessSecret("JWT_SECRET"));
   const token = req.header("Authorization")?.replace("Bearer ", "");
 
   if (!token) {
@@ -16,12 +17,10 @@ const authenticateJWT = async (req, res, next) => {
       return res.status(403).json({ message: "Forbidden: Invalid token" });
     }
 
-
     console.log("Decoded user:", user);
 
-
     const tokenUserId = user.userId.toLowerCase();
-    const paramAddress = req.params.address?.toLowerCase(); 
+    const paramAddress = req.params.address?.toLowerCase();
 
     if (paramAddress && tokenUserId !== paramAddress) {
       console.log(
