@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import apiClient from "../utils/apiClient";
+import './ChannelPage.css'
 
 const ChannelPage = () => {
   const [isFormVisible, setIsFormVisible] = useState(false);
@@ -16,6 +17,7 @@ const ChannelPage = () => {
   const { channelId } = useParams();
   const { userAddress, authToken } = useAuth();
   const navigate = useNavigate();
+
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -110,7 +112,8 @@ const ChannelPage = () => {
       </button>
 
       {isFormVisible && (
-        <form onSubmit={handlePostSubmit} style={{ marginTop: "20px" }}>
+        <form onSubmit={handlePostSubmit} 
+        className='new-post-form'>
           <div>
             <label>
               Title:
@@ -139,7 +142,8 @@ const ChannelPage = () => {
         </form>
       )}
 
-      <ul style={{ marginTop: "20px" }}>
+      <ul
+      className='post-list'>
         {posts.map((post) => (
           <li key={post._id}>
             <h3>

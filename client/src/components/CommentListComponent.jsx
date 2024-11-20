@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import apiClient from "../utils/apiClient";
 import ButtonDisplay from "./ActionButtons";
 import CommentForm from "./CommentForm";
+import './CommentListComponent.css'
 
 const CommentList = ({ comments, postId }) => {
   console.log("post id ", postId);
@@ -170,13 +171,7 @@ const CommentList = ({ comments, postId }) => {
       return (
         <div
           key={comment._id}
-          style={{
-            marginLeft: comment.parentId ? "20px" : "0px",
-            fontSize: "25px",
-            border: "2px solid black",
-            margin: "20px",
-            paddingLeft: "10px",
-          }}
+          className={`comment-list ${comment.parentId ? "indented-comment" : "no-indent"}`}
         >
           <p>{comment.text}</p>
           <span>

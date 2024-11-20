@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import './CommentForm.css'
 
 const CommentForm = ({ onSubmit, onCancel }) => {
   const [text, setText] = useState("");
@@ -19,11 +20,11 @@ const CommentForm = ({ onSubmit, onCancel }) => {
         placeholder="Write your comment here..."
         rows="4"
         cols="50"
-        style={{ marginBottom: "10px" }}
+        className='comment-form'
       ></textarea>
       <br />
       <button type="submit">Submit</button>
-      <button type="button" onClick={onCancel} style={{ marginLeft: "10px" }}>
+      <button type="button" className='cancel-btn' onClick={onCancel}>
         Cancel
       </button>
     </form>

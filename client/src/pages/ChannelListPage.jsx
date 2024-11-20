@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import apiClient from "../utils/apiClient.jsx";
 import "./ChannelListPage.css";
 import { useAuth } from "../context/AuthContext";
-import ButtonDisplay from "../components/ActionButtons.jsx"; // Import the ButtonDisplay component
+import './ChannelListPage.css'
 
 const ChannelPage = () => {
   const [isFormVisible, setIsFormVisible] = useState(false);
@@ -35,13 +35,7 @@ const ChannelPage = () => {
     <> 
 <p>You are signed in as {localStorage.getItem("ensName") == "null" ? userAddress: localStorage.getItem("ensName")}</p>
            <div
-      style={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: "20px",
-        justifyContent: "center",
-        padding: "20px",
-      }}
+           className='channel-list' 
     >
 
       {data.map((channel) => (
@@ -49,7 +43,7 @@ const ChannelPage = () => {
           <h3 className="channel-title">
             <a
               href={`/channels/${channel._id}`}
-              style={{ textDecoration: "none", color: "inherit" }}
+              className='channel-link'
             >
               {channel.name}
             </a>
