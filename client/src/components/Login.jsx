@@ -100,8 +100,10 @@ const Login = () => {
           <h3>Welcome!</h3>
           <p>You are signed in as {localStorage.getItem("ensName") == "null" ? userAddress: localStorage.getItem("ensName")}</p>
     
-          <button onClick={disconnectWallet}>Disconnect</button>
-          <a href="/channels">Browse Channels</a>
+          <button className='disconnect-btn' onClick={disconnectWallet}>Disconnect</button>
+          <button className="browse-channels-btn">
+            <a href="/channels">Browse Channels</a>
+          </button>
         </div>
       )}
     </div>

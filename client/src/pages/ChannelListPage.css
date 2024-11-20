@@ -1,5 +1,74 @@
+/* General Styles */
+body {
+  font-family: Arial, sans-serif;
+  background-color: var(--background-color-light);
+  color: var(--text-color-light);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+[data-theme="dark"] body {
+  background-color: var(--background-color-dark);
+  color: var(--text-color-dark);
+}
+
+[data-theme="dark"] .header-container {
+  background-color: var(--header-bg-dark);
+}
+
+[data-theme="dark"] .channel-card {
+  background-color: var(--card-bg-dark);
+}
+
+[data-theme="dark"] .channel-title {
+  color: var(--link-color-dark);
+}
+
+[data-theme="dark"] .user-info {
+  color: var(--text-color-dark);
+}
+
+/* Header Container */
+.header-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background-color: var(--header-bg);
+  border-bottom: 1px solid #ddd;
+}
+
+.header-buttons {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.theme-toggle-btn {
+  background-color: transparent;
+  border: none;
+  color: var(--link-color);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 10px;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.theme-toggle-btn:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Channel List Styles */
+.channel-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  padding: 20px;
+}
+
 .channel-card {
-  border: 1px solid #ddd;
+  background-color: var(--card-bg);
   border-radius: 8px;
   padding: 20px;
   width: 300px;
@@ -8,33 +77,56 @@
 }
 
 .channel-card:hover {
-  transform: scale(1.03);
+  transform: scale(1.05);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .channel-title {
   margin-bottom: 10px;
-  color: #007bff;
+  color: var(--link-color);
+  font-size: 20px;
   cursor: pointer;
 }
 
 .channel-description {
-  color: #555;
   font-size: 14px;
+  line-height: 1.5;
 }
 
-.channel-list{
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
-  padding: 20px
+/* Channel Link */
+.channel-link {
+  text-decoration: none;
+  color: inherit; /* Makes sure the link inherits the button color */
 }
 
-.channel-link{
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-    padding: 20px
+.channel-link:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .channel-list {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .channel-card {
+    width: 90%; /* Makes cards take more width on smaller screens */
+    margin-bottom: 15px;
+  }
+}
+
+/* Dark Theme Color Variables */
+:root {
+  --background-color-light: #f4f4f4;
+  --text-color-light: #333;
+  --header-bg: #ffffff;
+  --link-color: #007bff;
+  --card-bg: #ffffff;
+
+  --background-color-dark: #121212;
+  --text-color-dark: #f1f1f1;
+  --header-bg-dark: #1e1e1e;
+  --link-color-dark: #4b9fff;
+  --card-bg-dark: #2e2e2e;
 }

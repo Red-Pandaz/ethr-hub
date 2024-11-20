@@ -1,6 +1,4 @@
 // TODO:
-// Channel Page- organize posts in descending order by timestamp!
-// Post Page- organize comments in descending order by timestamp!
 // Format information on pages in helpful and concise way
 // Styling- Choose a good theme for the entire site!
 // Commenting- self explanatory.
@@ -24,7 +22,6 @@ function App() {
     <AuthProvider> 
       <Router>
         <div className="App">
-          <h1>Welcome to Ether-Hub</h1>
           <main>
             <Routes>
               <Route path="/login" element={<LoginPage />} /> 

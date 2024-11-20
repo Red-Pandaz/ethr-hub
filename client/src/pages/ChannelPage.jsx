@@ -2,9 +2,16 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import apiClient from "../utils/apiClient";
-import './ChannelPage.css'
+import './ChannelPage.css';
+
+const formatTimestamp = (timestamp) => {
+  const date = new Date(timestamp);
+  const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+  return date.toLocaleString('en-US', options);
+};
 
 const ChannelPage = () => {
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [posts, setPosts] = useState([]);
@@ -18,7 +25,17 @@ const ChannelPage = () => {
   const { userAddress, authToken } = useAuth();
   const navigate = useNavigate();
 
+  // Apply the theme to the document when it changes
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
+  const toggleTheme = () => {
+    setTheme(prev => (prev === "light" ? "dark" : "light"));
+  };
+
+  // Fetch channel and posts
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -27,15 +44,14 @@ const ChannelPage = () => {
           return;
         }
 
-        const response = await apiClient.get(
-          `http://localhost:5000/api/channels/${channelId}`
-        );
+        const response = await apiClient.get(`http://localhost:5000/api/channels/${channelId}`);
         if (!response.data.channel || response.data.channel.length === 0) {
           navigate("/error", { replace: true });
           return;
         }
 
-        setPosts(response.data.posts);
+        const sortedPosts = response.data.posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        setPosts(sortedPosts);
         setChannel(response.data.channel[0]);
       } catch (error) {
         console.error("Error fetching posts:", error);
@@ -47,13 +63,11 @@ const ChannelPage = () => {
     fetchPosts();
   }, [channelId]);
 
+  // Fetch ENS Name
   useEffect(() => {
     const fetchEnsName = async () => {
       try {
-        const response = await apiClient.get(
-          `http://localhost:5000/api/ensname/${userAddress}`
-        );
-
+        const response = await apiClient.get(`http://localhost:5000/api/ensname/${userAddress}`);
         setEnsName(response.data.ensName);
       } catch (error) {
         console.error("Error fetching ENS name:", error);
@@ -63,9 +77,7 @@ const ChannelPage = () => {
     if (userAddress) fetchEnsName();
   }, [userAddress]);
 
-  useEffect(() => {
-  }, [ensName]); 
-
+  // Handle post submission
   const handlePostSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -78,19 +90,13 @@ const ChannelPage = () => {
         userId: userAddress,
         channelId,
       };
-      const response = await apiClient.post(
-        "http://localhost:5000/api/writePost",
-        newPost,
-        {
-          headers: { Authorization: `Bearer ${authToken}` },
-        }
-      );
-
-      // setPosts([response.data, ...posts]);
+      const response = await apiClient.post("http://localhost:5000/api/writePost", newPost, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
       setPostTitle("");
       setPostText("");
       setIsFormVisible(false);
-      window.location.reload()
+      window.location.reload();
     } catch (error) {
       console.error("Error submitting post:", error);
     } finally {
@@ -101,18 +107,23 @@ const ChannelPage = () => {
   if (loading) return <p>Loading...</p>;
 
   return (
-    <div>
-<p>You are signed in as {localStorage.getItem("ensName") == "null" ? userAddress: localStorage.getItem("ensName")}</p>
-      <h1>{channel.name}</h1>
-      <h3>{channel.description}</h3>
-  
-      <button onClick={() => setIsFormVisible(!isFormVisible)}>
+    <div className={`channel-page-container ${theme}`}>
+      <div className="header-container">
+        <h1>{channel.name}</h1>
+        <h3>{channel.description}</h3>
+        <button onClick={toggleTheme} className="theme-toggle-btn">
+          Toggle Dark Mode
+        </button>
+      </div>
+
+      <p>You are signed in as {localStorage.getItem("ensName") === "null" ? userAddress : localStorage.getItem("ensName")}</p>
+
+      <button onClick={() => setIsFormVisible(!isFormVisible)} className="create-post-btn">
         {isFormVisible ? "Cancel" : "Create Post"}
       </button>
 
       {isFormVisible && (
-        <form onSubmit={handlePostSubmit} 
-        className='new-post-form'>
+        <form onSubmit={handlePostSubmit} className="new-post-form">
           <div>
             <label>
               Title:
@@ -141,17 +152,17 @@ const ChannelPage = () => {
         </form>
       )}
 
-      <ul
-      className='post-list'>
+      <div className="post-list">
         {posts.map((post) => (
-          <li key={post._id}>
+          <div key={post._id} className="post-item">
             <h3>
               <a href={`/posts/${post._id}`}>{post.title || "Untitled Post"}</a>
             </h3>
-            <p>by { post.ensName || post.createdBy || "No content available."}</p>
-          </li>
+            <p>by {post.ensName || post.createdBy || "No content available."}</p>
+            <p>Posted on {formatTimestamp(post.createdAt)}</p>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };

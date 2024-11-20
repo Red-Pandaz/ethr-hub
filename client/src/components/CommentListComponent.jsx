@@ -32,6 +32,34 @@ const CommentList = ({ comments, postId }) => {
     }
   });
 
+  // Sort comments and replies by timestamp in descending order
+  const sortCommentsByTimestamp = (comments) => {
+    return comments
+      .slice()
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Sort by timestamp
+      .map((comment) => {
+        // Recursively sort replies as well
+        if (comment.replies.length > 0) {
+          comment.replies = sortCommentsByTimestamp(comment.replies);
+        }
+        return comment;
+      });
+  };
+
+  const formatTimestamp = (timestamp) => {
+    const date = new Date(timestamp);
+    const options = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'America/New_York',
+      hour12: true,
+    };
+    return date.toLocaleString('en-US', options);
+  };
+
   useEffect(() => {
     const fetchEnsName = async () => {
       try {
@@ -152,6 +180,7 @@ const CommentList = ({ comments, postId }) => {
         (comment) => comment._id !== commentId
       );
       setIsEditing(null); // Close the edit form if any
+      window.location.reload()
     } catch (error) {
       console.error("Error deleting comment:", error);
     }
@@ -172,7 +201,7 @@ const CommentList = ({ comments, postId }) => {
         >
           <p>{comment.text}</p>
           <span>
-            From {comment.ensName || comment.userId} at {comment.createdAt}
+            From {comment.ensName || comment.userId} at {formatTimestamp(comment.createdAt)}
           </span>
           <br />
           <span>{upvotes} Upvotes</span> <span>{downvotes} Downvotes</span>
@@ -239,7 +268,10 @@ const CommentList = ({ comments, postId }) => {
     });
   };
 
-  return <div>{renderComments(nestedComments)}</div>;
+  // Sort the top-level comments and nested replies
+  const sortedComments = sortCommentsByTimestamp(nestedComments);
+
+  return <div>{renderComments(sortedComments)}</div>;
 };
 
 export default CommentList;
