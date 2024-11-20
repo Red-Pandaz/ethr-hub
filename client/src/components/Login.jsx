@@ -93,7 +93,7 @@ const Login = () => {
       {!isConnected ? (
         <div>
           <h3>Login with MetaMask</h3>
-          <button onClick={connectWallet}>Connect MetaMask</button>
+          <button className='connect-btn' onClick={connectWallet}>Connect MetaMask</button>
         </div>
       ) : (
         <div>

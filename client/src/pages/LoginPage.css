@@ -2,7 +2,7 @@
 [data-theme="dark"] {
   --background-color-dark: #1e1e1e;
   --text-color-dark: #ffffff;
-  --button-bg-dark: #444444;
+  --button-bg-dark: inherit
   --button-text-dark: #ffffff;
   --button-bg-hover-dark: #555555;
 }
@@ -30,8 +30,8 @@ body {
 }
 
 button {
-  background-color: var(--button-bg-dark);
-  color: var(--button-text-dark);
+  background-color: #007bff;
+  color: inherit;
   border: none;
   padding: 10px 20px;
   margin: 15px;

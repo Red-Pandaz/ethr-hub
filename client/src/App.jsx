@@ -1,6 +1,5 @@
 // TODO:
 // Format information on pages in helpful and concise way
-// Styling- Choose a good theme for the entire site!
 // Commenting- self explanatory.
 // README
 // Domain
