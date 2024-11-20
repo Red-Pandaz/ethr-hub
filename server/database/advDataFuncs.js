@@ -97,14 +97,14 @@ async function getDataForChannelFeed(channelId) {
 // The vote has 2 boolean values- hasUpvoted and hasDownvoted. These can both be false, or one of them can be true, but both of them cannot be true.
 
 async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction) {
-  console.log("Toggle Vote Params:", {
-    voteId,
-    uid,
-    itemId,
-    voteType,
-    itemType,
-    userAction,
-  });
+  // console.log("Toggle Vote Params:", {
+  //   voteId,
+  //   uid,
+  //   itemId,
+  //   voteType,
+  //   itemType,
+  //   userAction,
+  // });
   let result;
 
   if (!voteId) {
@@ -135,7 +135,6 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction) {
         "votes.upvotes",
         newVoteId
       );
-      console.log(newUpvote);
       if (itemType === "Posts") {
         await dataService.addToDocumentArray(
           "Users",
@@ -248,7 +247,6 @@ async function toggleVote(voteId, uid, itemId, voteType, itemType, userAction) {
           hasUpvoted: false,
         }
       );
-      console.log(voteUpdate);
       await dataService.removeFromDocumentArray(
         itemType,
         itemId,
@@ -461,7 +459,6 @@ async function editComment(newCommentText, cid) {
 
 // Function for deleting a comment
 async function deleteComment(cid, uid, pid) {
-  console.log(cid, uid, pid);
   await dataService.deleteDocumentById("Comments", cid);
   await dataService.removeFromDocumentArray("Users", uid, "comments", cid);
   await dataService.removeFromDocumentArray("Posts", pid, "comments", cid);
@@ -544,7 +541,6 @@ async function createUser(ethAddress) {
   const userCheck = await dataService.findOneDocumentByIndex("Users", {
     _id: ethAddress,
   });
-  console.log(userCheck);
   if (userCheck) {
     console.log("User already exists");
     return;

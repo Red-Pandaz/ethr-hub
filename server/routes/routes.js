@@ -31,8 +31,6 @@ router.post("/toggleVote", authenticateJWT, async (req, res) => {
   const userId = req.userId;
 
   if (userId.toLowerCase() !== req.body.userId.toLowerCase()) {
-    console.log("user id", userId.toLowerCase());
-    console.log(req.body.userId.toLowerCase());
     return res
       .status(403)
       .json({
@@ -139,13 +137,11 @@ router.delete("/deletePost", authenticateJWT, async (req, res) => {
 
 // Route for creating a comment
 router.post("/writeComment", authenticateJWT, async (req, res) => {
-  const { commentText, postId, parentId, userId, ensName } = req.body; // Add parentId here
-  const loggedInUserId = req.userId; // Extract authenticated user
+  const { commentText, postId, parentId, userId, ensName } = req.body; 
+  const loggedInUserId = req.userId; 
 
   // Check if the user ID from the token matches the user ID in the request body
   if (loggedInUserId.toLowerCase() !== userId.toLowerCase()) {
-    console.log("Authenticated user ID:", loggedInUserId.toLowerCase());
-    console.log("Request body user ID:", userId.toLowerCase());
     return res
       .status(403)
       .json({
@@ -153,7 +149,7 @@ router.post("/writeComment", authenticateJWT, async (req, res) => {
       });
   }
 
-  console.log("Authenticated user ID from token:", loggedInUserId); // Log the userId
+  console.log("Authenticated user ID from token:", loggedInUserId); 
   console.log("Received request body:", { commentText, postId, parentId });
 
   try {
@@ -200,9 +196,7 @@ router.put("/editComment", authenticateJWT, async (req, res) => {
 
 // Route for deleting a comment
 router.delete("/deleteComment", authenticateJWT, async (req, res) => {
-  console.log("delete request recieved", req.body);
   const { commentId, userId, postId } = req.body;
-  console.log("comment id ", commentId);
   const loggedInUserId = req.userId;
   if (loggedInUserId.toLowerCase() !== userId.toLowerCase()) {
     return res
@@ -242,7 +236,6 @@ router.get("/channels/:channelId", async (req, res) => {
     const { channelId } = req.params;
 
     const result = await advData.getDataForChannelFeed(channelId);
-    console.log(result);
     res.status(200).json(result);
   } catch (err) {
     console.error("Error getting post:", err);
@@ -256,7 +249,6 @@ router.get("/channels/:channelId", async (req, res) => {
 router.get("/channels", async (req, res) => {
   try {
     const result = await advData.getChannels();
-    console.log(result);
     res.status(200).json(result);
   } catch (err) {
     console.error("Error getting post:", err);
