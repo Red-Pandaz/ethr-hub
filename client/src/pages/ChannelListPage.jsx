@@ -45,8 +45,8 @@ const ChannelPage = () => {
     >
 
       {data.map((channel) => (
-        <div key={channel._id} class="channel-card">
-          <h3 class="channel-title">
+        <div key={channel._id} className="channel-card">
+          <h3 className="channel-title">
             <a
               href={`/channels/${channel._id}`}
               style={{ textDecoration: "none", color: "inherit" }}
@@ -54,7 +54,7 @@ const ChannelPage = () => {
               {channel.name}
             </a>
           </h3>
-          <p class="channel-description">{channel.description}</p>
+          <p className="channel-description">{channel.description}</p>
         </div>
       ))}
     </div>
