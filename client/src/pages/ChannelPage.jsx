@@ -89,10 +89,11 @@ const ChannelPage = () => {
         }
       );
 
-      setPosts([response.data, ...posts]);
+      // setPosts([response.data, ...posts]);
       setPostTitle("");
       setPostText("");
       setIsFormVisible(false);
+      window.location.reload()
     } catch (error) {
       console.error("Error submitting post:", error);
     } finally {
@@ -106,6 +107,7 @@ const ChannelPage = () => {
     <div>
 <p>You are signed in as {localStorage.getItem("ensName") == "null" ? userAddress: localStorage.getItem("ensName")}</p>
       <h1>{channel.name}</h1>
+      <h3>{channel.description}</h3>
   
       <button onClick={() => setIsFormVisible(!isFormVisible)}>
         {isFormVisible ? "Cancel" : "Create Post"}

@@ -1,15 +1,13 @@
 // TODO:
-// Channel Page- Thursday
-// Channel List Page- Thurday
-// Styling- Friday
-// Commenting- Friday
-// README- Friday
-// Domain- Saturday/Sunday
-// Droplet- Saturday/Sunday
+// Channel Page- organize posts in descending order by timestamp!
+// Post Page- organize comments in descending order by timestamp!
+// Format information on pages in helpful and concise way
+// Styling- Choose a good theme for the entire site!
+// Commenting- self explanatory.
+// README
+// Domain
+// Droplet
 
-// IF THERE IS TIME
-// Subscribing/Unsubscribing from Channels
-// Display user feed
 
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
