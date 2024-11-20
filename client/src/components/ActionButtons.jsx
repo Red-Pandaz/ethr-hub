@@ -21,7 +21,6 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
       switch (type) {
         case "upvotePost":
           {
-            console.log("Raw extraParam:", extraParam); // Debug raw extraParam
 
             // Extract necessary values
             const { itemId } = extraParam;
@@ -35,13 +34,6 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
               });
               return;
             }
-
-            console.log("Checking existing vote with:", {
-              voteType,
-              idType,
-              uid: userAddress,
-              itemId,
-            });
 
             try {
               // Check if a vote exists
@@ -59,9 +51,7 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
                   },
                 }
               );
-              console.log('62')
               const existingVote = doesVoteExist.data;
-              console.log("Existing vote:", existingVote);
 
               let vid = existingVote ? existingVote._id : null;
 
@@ -82,9 +72,6 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
                   },
                 }
               );
-              console.log('85', response)
-              console.log("Vote toggled successfully:", response.data);
-              console.log('87')
             } catch (error) {
               console.error("Error toggling vote:", error.message);
             }
@@ -94,7 +81,7 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
 
         case "downvotePost":
           {
-            console.log("Raw extraParam:", extraParam); // Debug raw extraParam
+
 
             // Extract necessary values
             const { itemId } = extraParam;
@@ -108,13 +95,6 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
               });
               return;
             }
-
-            console.log("Checking existing vote with:", {
-              voteType,
-              idType,
-              uid: userAddress,
-              itemId,
-            });
 
             try {
               // Check if a vote exists
@@ -132,9 +112,8 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
                   },
                 }
               );
-console.log('133')
               const existingVote = doesVoteExist.data;
-              console.log("Existing vote:", existingVote);
+
 
               let vid = existingVote ? existingVote._id : null;
 
@@ -155,8 +134,6 @@ console.log('133')
                   },
                 }
               );
-              console.log('156')
-              console.log("Vote toggled successfully:", response.data);
             } catch (error) {
               console.error("Error toggling vote:", error.message);
             }
@@ -174,9 +151,7 @@ console.log('133')
                 },
               }
             );
-            console.log('174')
             const existingVote = doesVoteExist.data;
-            console.log(JSON.stringify(doesVoteExist, null, 2));
             let vid;
             if (existingVote) {
               vid = existingVote._id.toString();
@@ -214,9 +189,7 @@ console.log('133')
                 },
               }
             );
-            console.log('213')
             const existingVote = doesVoteExist.data;
-            console.log(JSON.stringify(doesVoteExist, null, 2));
             let vid;
             if (existingVote) {
               vid = existingVote._id.toString();
@@ -280,8 +253,6 @@ console.log('133')
               );
           
               // Handle successful response
-              console.log('278')
-              console.log("Reply created successfully:", response.data);
             } catch (error) {
               // Handle errors more specifically
               if (error.response) {
@@ -329,10 +300,9 @@ console.log('133')
       }
 
       if (onClick) {
-        console.log('328')
-        console.log('resp: ', response)
+
         onClick(response.data); // Pass the response data to the onClick handler
-        console.log('330')
+
       }
     } catch (error) {
       console.error(
@@ -359,8 +329,6 @@ console.log('133')
           Authorization: `Bearer ${authToken}`,
         },
       });
-
-      console.log("Comment submitted successfully:", response.data);
 
       setIsFormVisible(false); // Hide the form
       setFormContent(""); // Clear the textarea

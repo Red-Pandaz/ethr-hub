@@ -154,8 +154,6 @@ const handleDelete = async () => {
             extraParam={{ userId: userAddress, itemId: postId }}
           />
 
-          {console.log(data.post.createdBy)}
-          {console.log(userAddress)}
           {data.post.createdBy === userAddress && (
             <div>
               {isEditing ? (

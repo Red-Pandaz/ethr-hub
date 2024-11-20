@@ -55,7 +55,6 @@ const ChannelPage = () => {
         );
 
         setEnsName(response.data.ensName);
-        console.log("ENS Name fetched:", ensName); // Log fetched value
       } catch (error) {
         console.error("Error fetching ENS name:", error);
       }
@@ -65,8 +64,7 @@ const ChannelPage = () => {
   }, [userAddress]);
 
   useEffect(() => {
-    console.log("ENS Name updated in state:", ensName);
-  }, [ensName]); // Runs whenever ensName changes
+  }, [ensName]); 
 
   const handlePostSubmit = async (e) => {
     e.preventDefault();
@@ -80,7 +78,6 @@ const ChannelPage = () => {
         userId: userAddress,
         channelId,
       };
-      console.log(newPost);
       const response = await apiClient.post(
         "http://localhost:5000/api/writePost",
         newPost,

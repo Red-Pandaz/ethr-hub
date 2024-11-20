@@ -6,7 +6,6 @@ import CommentForm from "./CommentForm";
 import './CommentListComponent.css'
 
 const CommentList = ({ comments, postId }) => {
-  console.log("post id ", postId);
   const [ensName, setEnsName] = useState(null);
   const { userAddress, authToken } = useAuth();
   const [activeComment, setActiveComment] = useState(null);
@@ -74,7 +73,6 @@ const CommentList = ({ comments, postId }) => {
 
   const handleCommentReplySubmit = async (text, parentId, postId, ensName) => {
     try {
-      console.log("postId: postId");
       const response = await apiClient.post(
         "http://localhost:5000/api/writeComment",
         {
@@ -107,7 +105,6 @@ const CommentList = ({ comments, postId }) => {
 
   const handleCommentEditSubmit = async (commentId) => {
     try {
-      console.log("edited text ", editedText);
       const response = await apiClient.put(
         `http://localhost:5000/api/editComment/`,
         {

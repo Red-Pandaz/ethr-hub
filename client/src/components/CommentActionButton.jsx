@@ -10,14 +10,13 @@ export default function CommentActionButton({
 
   async function submitComment(e) {
     e.preventDefault();
-    console.log(authToken);
     try {
       const response = await apiClient.post(
         "http://localhost:5000/api/writeComment",
         {
           commentText: formContent,
           postId: extraParam.postId,
-          userId: userAddress, // Ensure this matches the authenticated user
+          userId: userAddress, 
           parentId: extraParam.parentId || null,
         },
         {
@@ -26,9 +25,8 @@ export default function CommentActionButton({
           },
         }
       );
-      console.log("Comment successfully submitted:", response.data);
-      setShowForm(false); // Close the form
-      setFormContent(""); // Clear the text area
+      setShowForm(false); 
+      setFormContent(""); 
     } catch (error) {
       console.error("Error submitting comment:", error);
     }

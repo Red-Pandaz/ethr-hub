@@ -22,7 +22,6 @@ const PostPage = () => {
     isConnected,
     loading: contextLoading,
   } = useAuth();
-  console.log("auth token ", authToken);
 
   useEffect(() => {
     axios
@@ -40,9 +39,9 @@ const PostPage = () => {
   if (contextLoading || loading) return <p>Loading...</p>;
 
   if (!data) return <p>No data found</p>;
-  if (data) {
-    console.log(data);
-  }
+  // if (data) {
+  //   console.log(data);
+  // }
   if (!isConnected) return <p>Please log in to interact with the post.</p>;
 
   return (

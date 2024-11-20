@@ -67,13 +67,12 @@ const Login = () => {
         const data = await response.json();
 
         if (data.token) {
-          // Store token and ensName in localStorage
+      
           localStorage.setItem("authToken", data.token);
-          localStorage.setItem("ensName", data.ensName); // Store ensName
+          localStorage.setItem("ensName", data.ensName); 
           
-          // Call login from context
-          login(userAddress, data.token, data.ensName); // Pass ensName to context
-          console.log("Login successful!", data.token);
+         
+          login(userAddress, data.token, data.ensName); 
         } else {
           console.error("Login failed:", data.error || "Unknown error");
         }
@@ -99,7 +98,6 @@ const Login = () => {
       ) : (
         <div>
           <h3>Welcome!</h3>
-          {console.log(localStorage.getItem('ensName'))}
           <p>You are signed in as {localStorage.getItem("ensName") == "null" ? userAddress: localStorage.getItem("ensName")}</p>
     
           <button onClick={disconnectWallet}>Disconnect</button>

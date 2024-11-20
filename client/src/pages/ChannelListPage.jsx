@@ -12,14 +12,12 @@ const ChannelPage = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  console.log("channelId: " + channelId);
 
   useEffect(() => {
     apiClient
       .get(`http://localhost:5000/api/channels/`)
       .then((response) => {
         setData(response.data);
-        console.log(response.data);
         setLoading(false);
       })
       .catch((error) => {

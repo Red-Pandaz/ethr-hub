@@ -27,8 +27,8 @@ function App() {
           <h1>Welcome to Ether-Hub</h1>
           <main>
             <Routes>
-              <Route path="/login" element={<LoginPage />} /> {/* Add Login Route */}
-              <Route path="/error" element={<ErrorPage />} /> {/* Add Login Route */}
+              <Route path="/login" element={<LoginPage />} /> 
+              <Route path="/error" element={<ErrorPage />} />
               <Route path="/posts/:postId" element={
                 <ProtectedRoute>
                   <PostPage />
