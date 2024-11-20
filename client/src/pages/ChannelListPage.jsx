@@ -5,21 +5,15 @@ import { useAuth } from "../context/AuthContext";
 import './ChannelListPage.css';
 
 const ChannelListPage = () => {
-  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
   const { userAddress, authToken } = useAuth();
   const { channelId } = useParams();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Apply the theme to the document when it changes
+  // Apply dark mode directly when component mounts
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem('theme', theme); // Save theme in localStorage
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(prev => (prev === "light" ? "dark" : "light"));
-  };
+    document.documentElement.setAttribute("data-theme", "dark");
+  }, []);
 
   useEffect(() => {
     apiClient
@@ -47,13 +41,6 @@ const ChannelListPage = () => {
             ? userAddress
             : localStorage.getItem("ensName")}
         </p>
-
-        {/* Dark Mode Toggle Button */}
-        <div className="header-buttons">
-          <button onClick={toggleTheme} className="theme-toggle-btn">
-            {theme === "light" ? "Dark Mode" : "Light Mode"}
-          </button>
-        </div>
       </div>
 
       <div className="channel-list">

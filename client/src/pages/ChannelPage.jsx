@@ -11,7 +11,7 @@ const formatTimestamp = (timestamp) => {
 };
 
 const ChannelPage = () => {
-  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [posts, setPosts] = useState([]);
@@ -27,8 +27,7 @@ const ChannelPage = () => {
 
   // Apply the theme to the document when it changes
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem('theme', theme);
+    document.documentElement.setAttribute("data-theme", 'dark');
   }, [theme]);
 
   const toggleTheme = () => {
@@ -111,9 +110,6 @@ const ChannelPage = () => {
       <div className="header-container">
         <h1>{channel.name}</h1>
         <h3>{channel.description}</h3>
-        <button onClick={toggleTheme} className="theme-toggle-btn">
-          Toggle Dark Mode
-        </button>
       </div>
 
       <p>You are signed in as {localStorage.getItem("ensName") === "null" ? userAddress : localStorage.getItem("ensName")}</p>

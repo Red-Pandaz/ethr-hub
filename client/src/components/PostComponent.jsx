@@ -69,6 +69,7 @@ const Post = () => {
       setData({ ...data, post: response.data });
       setIsEditing(false);
       setEditedText("");
+      window.location.reload()
     } catch (error) {
       console.error("Error editing post:", error);
     }
@@ -153,8 +154,7 @@ const handleDelete = async () => {
             type={"downvotePost"}
             extraParam={{ userId: userAddress, itemId: postId }}
           />
-
-          {data.post.createdBy === userAddress && (
+          {data.post.createdBy === userAddress.toLowerCase() && (
             <div>
               {isEditing ? (
                 <>

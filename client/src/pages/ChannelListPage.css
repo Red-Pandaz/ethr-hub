@@ -1,8 +1,8 @@
 /* General Styles */
 body {
   font-family: Arial, sans-serif;
-  background-color: var(--background-color-light);
-  color: var(--text-color-light);
+  background-color: var(--background-color-dark);
+  color: var(--text-color-dark);
   transition: background-color 0.3s, color 0.3s;
 }
 
@@ -33,7 +33,7 @@ body {
   flex-direction: column;
   align-items: center;
   padding: 20px;
-  background-color: var(--header-bg);
+  background-color: var(--header-bg-dark);
   border-bottom: 1px solid #ddd;
 }
 
@@ -41,21 +41,6 @@ body {
   display: flex;
   justify-content: flex-end;
   width: 100%;
-}
-
-.theme-toggle-btn {
-  background-color: transparent;
-  border: none;
-  color: var(--link-color);
-  cursor: pointer;
-  font-size: 16px;
-  padding: 10px;
-  border-radius: 5px;
-  transition: background-color 0.3s;
-}
-
-.theme-toggle-btn:hover {
-  background-color: rgba(0, 0, 0, 0.1);
 }
 
 /* Channel List Styles */
@@ -68,7 +53,7 @@ body {
 }
 
 .channel-card {
-  background-color: var(--card-bg);
+  background-color: var(--card-bg-dark);
   border-radius: 8px;
   padding: 20px;
   width: 300px;
@@ -83,7 +68,7 @@ body {
 
 .channel-title {
   margin-bottom: 10px;
-  color: var(--link-color);
+  color: var(--link-color-dark);
   font-size: 20px;
   cursor: pointer;
 }
@@ -96,7 +81,7 @@ body {
 /* Channel Link */
 .channel-link {
   text-decoration: none;
-  color: inherit; /* Makes sure the link inherits the button color */
+  color: inherit;
 }
 
 .channel-link:hover {
@@ -111,19 +96,13 @@ body {
   }
 
   .channel-card {
-    width: 90%; /* Makes cards take more width on smaller screens */
+    width: 90%;
     margin-bottom: 15px;
   }
 }
 
 /* Dark Theme Color Variables */
 :root {
-  --background-color-light: #f4f4f4;
-  --text-color-light: #333;
-  --header-bg: #ffffff;
-  --link-color: #007bff;
-  --card-bg: #ffffff;
-
   --background-color-dark: #121212;
   --text-color-dark: #f1f1f1;
   --header-bg-dark: #1e1e1e;
