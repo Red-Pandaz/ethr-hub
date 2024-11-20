@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import apiClient from "../utils/apiClient.jsx";
 import "./ChannelListPage.css";
 import { useAuth } from "../context/AuthContext";
-
 import ButtonDisplay from "../components/ActionButtons.jsx"; // Import the ButtonDisplay component
 
 const ChannelPage = () => {

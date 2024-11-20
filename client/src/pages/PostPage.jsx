@@ -2,21 +2,20 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import axios from "axios";
-import ButtonDisplay from "../components/ActionButtons"; // Adjust the import path as needed
-import CommentForm from "../components/CommentForm"; // A new component for the comment form
+import ButtonDisplay from "../components/ActionButtons";
+import CommentForm from "../components/CommentForm";
 import CommentActionButton from "../components/CommentActionButton";
-import CommentList from "../components/CommentListComponent"; // Adjust the import path as needed
-import Post from "../components/PostComponent"; // Adjust the import path as needed
-
+import CommentList from "../components/CommentListComponent";
+import Post from "../components/PostComponent";
 const PostPage = () => {
-  const [activeComment, setActiveComment] = useState(null); // Tracks which comment is being replied to
-  const [isAddingComment, setIsAddingComment] = useState(false); // Tracks top-level comment form visibility
+  const [activeComment, setActiveComment] = useState(null); 
+  const [isAddingComment, setIsAddingComment] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const { postId, channelId } = useParams();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Access the logged-in userAddress from context
+
   const {
     userAddress,
     authToken,

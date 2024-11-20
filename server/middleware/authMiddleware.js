@@ -1,7 +1,8 @@
 const jwt = require("jsonwebtoken");
-const secretKey = "thisIsJustATestToken";
+const { retryApiCall, accessSecret } = require("../utils/apiutils.js");
 
-const authenticateJWT = (req, res, next) => {
+const authenticateJWT = async (req, res, next) => {
+  const JWT_SECRET =  await retryApiCall(() => accessSecret("JWT_SECRET"));
   const token = req.header("Authorization")?.replace("Bearer ", "");
 
   if (!token) {
@@ -9,7 +10,7 @@ const authenticateJWT = (req, res, next) => {
     return res.status(401).json({ message: "Unauthorized: No token provided" });
   }
 
-  jwt.verify(token, secretKey, (err, user) => {
+  jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) {
       console.log("Invalid token:", err);
       return res.status(403).json({ message: "Forbidden: Invalid token" });

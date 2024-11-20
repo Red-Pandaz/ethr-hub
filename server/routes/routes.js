@@ -4,8 +4,8 @@ const jwt = require('jsonwebtoken');
 const advData = require('../database/advDataFuncs.js');
 const { verifySignature } = require ('../utils/apiutils.js')
 const authenticateJWT = require('../middleware/authMiddleware.js');
+const { retryApiCall, accessSecret } = require("../utils/apiutils.js");
 
-const JWT_SECRET = 'thisIsJustATestToken'
 
 router.post('/toggleSave', async (req, res) => {
     try {
@@ -256,6 +256,7 @@ router.get('/commentvotes', async (req, res) => {
     }
 });
 router.post('/login', async (req, res) => {
+    const JWT_SECRET =  await retryApiCall(() => accessSecret("JWT_SECRET"));
     const { address, signature, message } = req.body;
     let ensName;
 
@@ -279,7 +280,8 @@ router.post('/login', async (req, res) => {
 });
 
 
-router.post('/verify-token', (req, res) => {
+router.post('/verify-token', async (req, res) => {
+    const JWT_SECRET =  await retryApiCall(() => accessSecret("JWT_SECRET"));
     const { token } = req.body;
     try {
       const decoded = jwt.verify(token, JWT_SECRET);
