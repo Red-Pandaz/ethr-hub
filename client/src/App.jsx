@@ -1,7 +1,6 @@
 // TODO:
 // Try to fix rerender
 // Commenting- self explanatory.
-// README
 // Full deploy
 
 

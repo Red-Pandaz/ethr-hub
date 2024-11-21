@@ -1,22 +1,40 @@
 # Ethr Hub
 
 ## Project Description
-This repository was created to fulfill the requirements of the Per Scholas capstone project. It is a watered-down reddit clone that uses Ethereum for user authentication. This project is currently deployed to [ethrhub.xyz](https://ethrhub.xyz)
+
+This repository was created to fulfill the requirements of the Per Scholas capstone project. It is a simplified Reddit clone that uses **Ethereum** for user authentication. The project is currently deployed at [ethrhub.xyz](https://ethrhub.xyz).
+
+---
 
 ## How to Use
-An unauthenticated user will be prompted to sign in using Metamask. Previously authenticated accounts have a database document while newly authenticated accounts have a database document created for them upon initial login. Creating a new user prompts the program to search ENS for an names that resolve to the authenticated address. ENS names are displayed in place of their resolved address every place applicable on the website.
 
-Once logged in, the client is issued a JWT which allows browsing and posting access for one hour. /channels provides a list of channels to browse while /channels/:channelId lists all the posts associated with a specific channel in descending order by timestamp. It also provides a form to create new posts within that channel. 
+1. **Authentication**  
+   - Unauthenticated users will be prompted to sign in using **MetaMask**.  
+   - Returning users have their accounts stored in the database.  
+   - New users are automatically added to the database upon their initial login. During account creation, the program checks **ENS (Ethereum Name Service)** for names that resolve to the authenticated address.  
+   - Wherever applicable, ENS names are displayed in place of their resolved Ethereum addresses on the website.
 
-/posts/:postId displays the title and content of a given post as well as all associated comments. On this page if the creator of a post is authenticated they can edit or delete the post. Creators of comments are also able to edit or delete their comments here. Deleting a comment will automatically remove all child comments from the display.
+2. **Session and Access**  
+   - Once logged in, users receive a **JWT** that grants browsing and posting access for one hour.
+
+3. **Navigation**  
+   - `/channels`: Displays a list of channels available for browsing.  
+   - `/channels/:channelId`: Lists all posts within a specific channel in descending order by timestamp. A form is provided to create new posts in that channel.  
+   - `/posts/:postId`: Displays the title and content of a post along with all associated comments.  
+     - **Post and Comment Management**:  
+       - Post creators can edit or delete their posts.  
+       - Comment creators can edit or delete their comments.  
+       - Deleting a comment automatically removes all of its child comments from the display.
+
+---
 
 ## Technologies Used
-MongoDB
-Express
-ReactJS
-Node.js
-Ethers.js
-Ethereum Name Service
-Google Cloud Secrets
 
-
+- **MongoDB**  
+- **Express.js**  
+- **React.js**  
+- **Node.js**  
+- **Ethers.js**  
+- **Ethereum Name Service (ENS)**  
+- **Google Cloud Secrets**  
+- **DigitalOcean**

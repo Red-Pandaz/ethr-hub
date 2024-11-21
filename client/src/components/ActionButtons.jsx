@@ -1,31 +1,33 @@
+// This file was initially created to handle the logic for ALL buttons
+// However, the only buttons defined here that are currently used are the voting buttons
+// Any voting action first checks the database to see if there is a match for the given userId/postId or userId/commentId
+// If one does not exist, a new one is created with the state of the voting action that prompted its creation
+// If the vote object does exist, its state is toggled depending on its current state and the user action
+// two boolean values- hasUpvoted and hasDownvoted can both be false, indicating a neutral vote. However if one is true then the other must be false.
+
 import React, { useState } from "react";
-import Button from "./Button"; // Import the Button component
+import Button from "./Button";
 import { useAuth } from "../context/AuthContext";
-import apiClient from '../utils/apiClient'
+import apiClient from "../utils/apiClient";
 
 const ButtonDisplay = ({ type, extraParam, onClick }) => {
-  const { userAddress } = useAuth(); // Access userAddress from AuthContext
+  const { userAddress } = useAuth();
   const [isFormVisible, setIsFormVisible] = useState(false);
-  const [formContent, setFormContent] = useState(""); // Form state for comments
+  const [formContent, setFormContent] = useState("");
   const handleClick = async () => {
-    // Retrieve the authToken from localStorage
     const authToken = localStorage.getItem("authToken");
     try {
       if (!userAddress) {
         console.error("User is not logged in.");
         return;
       }
-
       let response;
-
       switch (type) {
         case "upvotePost":
           {
-
-            // Extract necessary values
             const { itemId } = extraParam;
-            const voteType = "Post Votes"; // Fixed value for posts
-            const idType = "postId"; // Fixed value for post identifier
+            const voteType = "Post Votes";
+            const idType = "postId";
 
             if (!userAddress || !itemId) {
               console.error("Missing required parameters:", {
@@ -36,7 +38,6 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
             }
 
             try {
-              // Check if a vote exists
               const doesVoteExist = await apiClient.get(
                 `http://localhost:5000/api/checkExistingVote`,
                 {
@@ -46,7 +47,7 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
                   params: {
                     voteType,
                     idType,
-                    uid: userAddress.toLowerCase(), // Match backend expectation
+                    uid: userAddress.toLowerCase(),
                     itemId,
                   },
                 }
@@ -55,7 +56,6 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
 
               let vid = existingVote ? existingVote._id : null;
 
-              // Toggle the vote
               response = await apiClient.post(
                 "http://localhost:5000/api/toggleVote",
                 {
@@ -76,17 +76,14 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
               console.error("Error toggling vote:", error.message);
             }
           }
-          window.location.reload()
+          window.location.reload();
           break;
 
         case "downvotePost":
           {
-
-
-            // Extract necessary values
             const { itemId } = extraParam;
-            const voteType = "Post Votes"; // Fixed value for posts
-            const idType = "postId"; // Fixed value for post identifier
+            const voteType = "Post Votes";
+            const idType = "postId";
 
             if (!userAddress || !itemId) {
               console.error("Missing required parameters:", {
@@ -97,7 +94,6 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
             }
 
             try {
-              // Check if a vote exists
               const doesVoteExist = await apiClient.get(
                 `http://localhost:5000/api/checkExistingVote`,
                 {
@@ -107,17 +103,14 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
                   params: {
                     voteType,
                     idType,
-                    uid: userAddress.toLowerCase(), // Match backend expectation
+                    uid: userAddress.toLowerCase(),
                     itemId,
                   },
                 }
               );
               const existingVote = doesVoteExist.data;
 
-
               let vid = existingVote ? existingVote._id : null;
-
-              // Toggle the vote
               response = await apiClient.post(
                 "http://localhost:5000/api/toggleVote",
                 {
@@ -138,9 +131,8 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
               console.error("Error toggling vote:", error.message);
             }
           }
-          window.location.reload()
+          window.location.reload();
           break;
-
         case "upvoteComment":
           {
             const doesVoteExist = await apiClient.get(
@@ -176,7 +168,7 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
               }
             );
           }
-          window.location.reload()
+          window.location.reload();
           break;
 
         case "downvoteComment":
@@ -214,57 +206,53 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
               }
             );
           }
-          window.location.reload()
+          window.location.reload();
           break;
 
-          case "reply": {
-            try {
-              const { commentText, postId, parentId, ensName } = extraParam;
-          
-              // Ensure commentText and postId are provided
-              if (!commentText || !postId) {
-                console.error("Missing required parameters for replying:", { commentText, postId });
-                return;
-              }
-          
-              // Ensure authToken exists
-              if (!authToken) {
-                console.error("User is not authorized. Missing auth token.");
-                return;
-              }
-          
-              // Prepare the data for the API call
-              const requestData = {
-                commentText, // Text of the reply
-                postId,      // The ID of the post
-                parentId: parentId || null, // Ensure parentId is passed as null for top-level comments
-                ensName: ensName || null,   // Optional: If ensName is not provided, default to null
-              };
-          
-              // Send the API request to create the comment
-              response = await apiClient.post(
-                "http://localhost:5000/api/writeComment", 
-                requestData,
-                {
-                  headers: {
-                    Authorization: `Bearer ${authToken}`,
-                  },
-                }
-              );
-          
-              // Handle successful response
-            } catch (error) {
-              // Handle errors more specifically
-              if (error.response) {
-                console.error("Error creating reply:", error.response.data); // Error from the API
-              } else {
-                console.error("Error creating reply:", error.message); // General error (e.g., network)
-              }
+        case "reply": {
+          try {
+            const { commentText, postId, parentId, ensName } = extraParam;
+
+            // Ensure commentText and postId are provided
+            if (!commentText || !postId) {
+              console.error("Missing required parameters for replying:", {
+                commentText,
+                postId,
+              });
+              return;
             }
-            break;
+
+            // Ensure authToken exists
+            if (!authToken) {
+              console.error("User is not authorized. Missing auth token.");
+              return;
+            }
+
+            const requestData = {
+              commentText,
+              postId,
+              parentId: parentId || null,
+              ensName: ensName || null,
+            };
+
+            response = await apiClient.post(
+              "http://localhost:5000/api/writeComment",
+              requestData,
+              {
+                headers: {
+                  Authorization: `Bearer ${authToken}`,
+                },
+              }
+            );
+          } catch (error) {
+            if (error.response) {
+              console.error("Error creating reply:", error.response.data);
+            } else {
+              console.error("Error creating reply:", error.message);
+            }
           }
-          
-          
+          break;
+        }
 
         case "createPost": {
           onClick();
@@ -272,12 +260,15 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
         }
 
         case "submitPost":
-          response = await apiClient.post("https://localhost:5000/api/writePost", {
-            postTitle: extraParam.postTitle,
-            postText: extraParam.postText,
-            userId: userAddress,
-            channelId: extraParam.channelId,
-          });
+          response = await apiClient.post(
+            "https://localhost:5000/api/writePost",
+            {
+              postTitle: extraParam.postTitle,
+              postText: extraParam.postText,
+              userId: userAddress,
+              channelId: extraParam.channelId,
+            }
+          );
           break;
 
         case "editPost":
@@ -300,9 +291,7 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
       }
 
       if (onClick) {
-
-        onClick(response.data); // Pass the response data to the onClick handler
-
+        onClick(response.data);
       }
     } catch (error) {
       console.error(
@@ -330,8 +319,8 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
         },
       });
 
-      setIsFormVisible(false); // Hide the form
-      setFormContent(""); // Clear the textarea
+      setIsFormVisible(false);
+      setFormContent("");
     } catch (error) {
       console.error("Error submitting comment:", error);
     }
@@ -362,7 +351,7 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
             Downvote Comment
           </Button>
         );
-        
+
       case "createPost":
         return (
           <Button onClick={handleClick} className="button create">
@@ -386,7 +375,7 @@ const ButtonDisplay = ({ type, extraParam, onClick }) => {
           <Button onClick={handleClick} className="button reply">
             Reply
           </Button>
-        )
+        );
       case "editComment":
         return (
           <Button onClick={handleClick} className="button edit">
