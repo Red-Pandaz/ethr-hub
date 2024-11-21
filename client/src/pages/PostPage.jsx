@@ -35,7 +35,7 @@ const PostPage = () => {
   if (!isConnected) return <p>Please log in to interact with the post.</p>;
 
   return (
-    <div>
+    <div style={{marginLeft: "15px"}}>
       <p>You are signed in as {localStorage.getItem("ensName") === "null" ? userAddress : localStorage.getItem("ensName")}</p>
       <Post data={data} />
       {data.comments && (

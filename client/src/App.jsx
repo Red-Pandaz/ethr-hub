@@ -1,5 +1,5 @@
 // TODO:
-// Format information on pages in helpful and concise way
+// Try to fix rerender
 // Commenting- self explanatory.
 // README
 // Domain

@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import apiClient from "../utils/apiClient";
-import ButtonDisplay from "./ActionButtons"; // Assuming this component is used for upvoting/downvoting
-import CommentForm from "./CommentForm"; // Assuming this is your reply form
+import ButtonDisplay from "./ActionButtons"; 
+import CommentForm from "./CommentForm"; 
+import './PostComponent.css'
+
 
 const Post = () => {
   const [ensName, setEnsName] = useState(null);
@@ -11,13 +13,13 @@ const Post = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const { userAddress, authToken } = useAuth();
-  const [isEditing, setIsEditing] = useState(false); // For editing mode
-  const [editedText, setEditedText] = useState(""); // For storing edited text
-  const [activeComment, setActiveComment] = useState(null); // For managing active comment form
-  const navigate = useNavigate(); // To navigate after delete
+  const [isEditing, setIsEditing] = useState(false); 
+  const [editedText, setEditedText] = useState("");
+  const [activeComment, setActiveComment] = useState(null); 
+  const navigate = useNavigate(); 
 
   const navigateBack = () => {
-    navigate(-1); // Go back to the previous page
+    navigate(-1);
   };
 
   useEffect(() => {
@@ -57,7 +59,7 @@ const Post = () => {
         {
           newPostText: editedText,
           userId: userAddress,
-          postId: postId,  // Send postId in the body instead
+          postId: postId,
         },
         {
           headers: {
@@ -78,7 +80,7 @@ const Post = () => {
 const handleDelete = async () => {
     try {
       await apiClient.delete(`http://localhost:5000/api/deletePost`, {
-        data: { userId: userAddress, postId: postId },  // Send postId in the body instead
+        data: { userId: userAddress, postId: postId }, 
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -126,7 +128,7 @@ const handleDelete = async () => {
   if (!data) return <p>No post found</p>;
 
   return (
-    <div>
+    <div class='post'>
       <div key={postId}>
         <h2>{data.post.title}</h2>
         <span><strong>Created by {data.post.ensName || data.post.createdBy}</strong></span>
@@ -171,7 +173,6 @@ const handleDelete = async () => {
           )}
         </div>
 
-        {/* Reply Button */}
         <button
           onClick={() =>
             setActiveComment(activeComment === postId ? null : postId)
@@ -180,7 +181,7 @@ const handleDelete = async () => {
           Reply
         </button>
 
-        {/* Reply Form */}
+
         {activeComment === postId && (
           <CommentForm
             onSubmit={(text) => handleReplySubmit(text)}
