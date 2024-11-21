@@ -2,8 +2,7 @@
 // Try to fix rerender
 // Commenting- self explanatory.
 // README
-// Domain
-// Droplet
+// Full deploy
 
 
 import React from 'react';
