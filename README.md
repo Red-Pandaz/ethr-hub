@@ -1,3 +1,5 @@
+**This is the repository that was submitted for the Per Scholas capstone project and was originally built with Create React App. Due to deployment problems the application was rebuilt in Vite and also adjusted for https compatability. The repository for the deployed application can be found [here](https://github.com/red-Pandaz/ethr-hub2).** 
+
 # Ethr Hub
 
 ## Project Description
